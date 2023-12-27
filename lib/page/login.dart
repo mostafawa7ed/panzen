@@ -1,187 +1,173 @@
-// import 'package:council_of_state/functions/AfterBuild.dart';
-// import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import '../data/staticdata.dart';
-// import '../providerclasses.dart/providerUserData.dart';
-// import '../providerclasses.dart/providerlanguage.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:untitled4/controller/providerLogin.dart';
+import 'package:untitled4/data/staticdata.dart';
+import 'package:untitled4/functions/mediaquery.dart';
+import 'package:untitled4/model/user_model.dart';
 
-// class Login extends StatefulWidget {
-//   const Login({
-//     Key? key,
-//   }) : super(key: key);
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
 
-//   static const routeName = 'login_screen';
-
-//   @override
-//   State<Login> createState() => _LoginState();
-// }
-
-// class _LoginState extends State<Login> {
-//   final GlobalKey<FormState> _formKey = GlobalKey();
-
-//   final FocusNode _focusNodePassword = FocusNode();
-//   final TextEditingController _controllerUsername = TextEditingController();
-//   final TextEditingController _controllerPassword = TextEditingController();
-//   bool _obscurePassword = true;
-
-//   late SharedPreferences _sharedPreferences;
-//   String? languge;
-//   void initState() {
-//     super.initState();
-//     _loadLanguage(); // Load stored data when the widget initializes
-//   }
-
-//   Future<void> _loadLanguage() async {
-//     _sharedPreferences = await SharedPreferences.getInstance();
-//     setState(() {
-//       languge = _sharedPreferences.getString('language') ?? '';
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     checkConnection(context, Login.routeName);
-//     final languageProvider = Provider.of<LanguageProvider>(context);
-//     languageProvider.changelanguage(languge);
-//     return Scaffold(
-//       body: Container(
-//         color: StaticData.backgroundColors,
-//         child: Form(
-//           key: _formKey,
-//           child: SingleChildScrollView(
-//             padding: const EdgeInsets.all(10.0),
-//             child: Column(
-//               children: [
-//                 Image.asset(
-//                   StaticData.imageLogo,
-//                   height: 300,
-//                   width: 300,
-//                 ),
-//                 const SizedBox(height: 10),
-//                 Text(
-//                   languageProvider.getCurrentData('login', context),
-//                   style: TextStyle(
-//                       fontSize: 40,
-//                       color: StaticData.font,
-//                       fontFamily: StaticData.fontFamily),
-//                   textAlign: TextAlign.center,
-//                 ),
-//                 const SizedBox(height: 60),
-//                 TextFormField(
-//                   controller: _controllerUsername,
-//                   keyboardType: TextInputType.name,
-//                   //textDirection: TextDirection.rtl,
-//                   decoration: InputDecoration(
-//                     labelText:
-//                         languageProvider.getCurrentData('userName', context),
-//                     prefixIcon: const Icon(Icons.person_outline),
-//                     border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                     labelStyle: TextStyle(
-//                       fontFamily: StaticData.fontFamily,
-//                     ),
-//                   ),
-//                   onEditingComplete: () => _focusNodePassword.requestFocus(),
-//                   validator: (String? value) {
-//                     if (value == null || value.trim().isEmpty) {
-//                       return languageProvider.getCurrentData(
-//                           'plzEnterUserName', context);
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//                 const SizedBox(height: 10),
-//                 TextFormField(
-//                   controller: _controllerPassword,
-//                   focusNode: _focusNodePassword,
-//                   obscureText: _obscurePassword,
-//                   //textDirection: TextDirection.rtl,
-//                   //keyboardType: TextInputType.visiblePassword,
-//                   decoration: InputDecoration(
-//                     labelText:
-//                         languageProvider.getCurrentData('password', context),
-//                     prefixIcon: const Icon(Icons.password_outlined),
-//                     suffixIcon: IconButton(
-//                         onPressed: () {
-//                           setState(() {});
-//                           if (_obscurePassword) {
-//                             _obscurePassword = false;
-//                           } else {
-//                             _obscurePassword = true;
-//                           }
-//                         },
-//                         icon: _obscurePassword
-//                             ? const Icon(Icons.visibility_outlined)
-//                             : const Icon(Icons.visibility_off_outlined)),
-//                     border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                     labelStyle: TextStyle(
-//                       fontFamily: StaticData.fontFamily,
-//                     ),
-//                   ),
-//                   validator: (String? value) {
-//                     if (value == null || value.isEmpty) {
-//                       return languageProvider.getCurrentData(
-//                           'plzEnterPassword', context);
-//                     }
-
-//                     return null;
-//                   },
-//                 ),
-//                 const SizedBox(height: 60),
-//                 Column(
-//                   children: [
-//                     Consumer<ProviderUserData>(
-//                         builder: (context, user_data, child) {
-//                       return ElevatedButton(
-//                         style: ElevatedButton.styleFrom(
-//                           backgroundColor:
-//                               StaticData.button, // Background color
-//                           minimumSize: const Size.fromHeight(50),
-//                           shape: RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.circular(20),
-//                           ),
-//                         ),
-//                         onPressed: () async {
-//                           var userName = _controllerUsername.text.trim();
-//                           user_data.setterUser(
-//                               userName, _controllerPassword.text.trim());
-//                           await user_data.login(
-//                               context,
-//                               _controllerUsername.text.trim(),
-//                               _controllerPassword.text.trim());
-//                         },
-//                         child: Text(
-//                             languageProvider.getCurrentData('login', context),
-//                             style: TextStyle(
-//                                 fontSize: 20,
-//                                 fontFamily: StaticData.fontFamily)),
-//                       );
-//                     })
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   @override
-//   void dispose() {
-//     _focusNodePassword.dispose();
-//     _controllerUsername.dispose();
-//     _controllerPassword.dispose();
-//     super.dispose();
-//   }
-// }
+class _LoginPageState extends State<LoginPage> {
+  bool _showChangePassword = false;
+  final _formKey = GlobalKey<FormState>();
+  late String _email;
+  late String _password;
+  TextEditingController userName = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController newPassword = TextEditingController();
+  TextEditingController rewriteNewPassword = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login Page'),
+        centerTitle: true,
+      ),
+      body: Container(
+        alignment: Alignment.center,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Container(
+              width: getSizePage(context, 1, 50),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    TextFormField(
+                      controller: userName,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _email = value!;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: password,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _password = value!;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+                          final ProviderLogin providerLogin =
+                              Provider.of<ProviderLogin>(context,
+                                  listen: false);
+                          User user = User();
+                          user.userName = _email;
+                          user.password = _password;
+                          User? loginUser = await providerLogin.login(
+                              StaticData.urlLogin, user);
+                          if (loginUser != null) {
+                            print('Email: $_email');
+                            print('Password: $_password');
+                          } else {
+                            print('Faild login');
+                          }
+                        }
+                      },
+                      child: Text('Login'),
+                    ),
+                    SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _showChangePassword = true;
+                                });
+                              },
+                              child: Text('Change Password'),
+                            ),
+                            SizedBox(height: 20),
+                            if (_showChangePassword) ...[
+                              TextFormField(
+                                controller: newPassword,
+                                decoration: InputDecoration(
+                                  labelText: 'New Password',
+                                  border: OutlineInputBorder(),
+                                ),
+                                obscureText: true,
+                              ),
+                              SizedBox(height: 20),
+                              TextFormField(
+                                controller: rewriteNewPassword,
+                                decoration: InputDecoration(
+                                  labelText: 'Re-enter New Password',
+                                  border: OutlineInputBorder(),
+                                ),
+                                obscureText: true,
+                              ),
+                              SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  User user = User();
+                                  User currentUser = User();
+                                  currentUser.userName = userName.text;
+                                  currentUser.password = password.text;
+                                  final ProviderLogin providerLogin =
+                                      Provider.of<ProviderLogin>(context,
+                                          listen: false);
+                                  User? loginUser = User();
+                                  loginUser = await providerLogin.login(
+                                      StaticData.urlLogin, currentUser);
+                                  if (loginUser != null &&
+                                      newPassword.text ==
+                                          rewriteNewPassword.text) {
+                                    user.userName = userName.text;
+                                    user.id = loginUser.id;
+                                    user.password = rewriteNewPassword.text;
+                                    User? userAfterChange =
+                                        await providerLogin.changeUserPassword(
+                                            StaticData.urlChangeUserPassword,
+                                            user);
+                                  }
+                                },
+                                child: Text('Save'),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

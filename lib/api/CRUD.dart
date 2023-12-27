@@ -1,9 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:http/http.dart';
-
-//to chaneg json file
 
 class Crud {
   getRequest(String url) async {
@@ -50,6 +47,36 @@ class Crud {
       }
     } catch (e) {
       print(e.toString());
+      return myMap;
+    }
+  }
+
+  Future<Map<String, dynamic>> putRequest(
+    String url,
+    Map<String, dynamic> dataToUpdate,
+  ) async {
+    Map<String, dynamic> myMap = {};
+    var map = jsonEncode(dataToUpdate);
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(dataToUpdate),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body.toString());
+        myMap = data;
+        print('Data updated successfully');
+        return myMap;
+      } else {
+        print('Failed to update data');
+        return myMap;
+      }
+    } catch (e) {
+      print('Error: $e');
       return myMap;
     }
   }
