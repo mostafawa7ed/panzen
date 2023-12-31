@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:untitled4/controller/providerLogin.dart';
 import 'package:untitled4/controller/provider_transportation_fee.dart';
 import 'package:untitled4/page/login.dart';
+import 'package:untitled4/page/home.dart';
+import 'package:untitled4/page/tansportationfee.dart';
 
 void main() {
   runApp(
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -46,6 +48,11 @@ class _MyHomePageState extends State<MyHomePage> {
   final PageController controller = PageController();
   @override
   Widget build(BuildContext context) {
-    return LoginPage();
+    // return HomePage(
+    //   controller: controller,
+    // );
+    return HomePage(
+      controller: controller,
+    );
   }
 }

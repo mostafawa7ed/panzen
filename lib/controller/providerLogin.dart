@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:untitled4/api/CRUD.dart';
 import 'package:untitled4/model/user_model.dart';
@@ -31,7 +33,7 @@ class ProviderLogin extends ChangeNotifier {
     }
   }
 
-  Future<User?> changeUserPassword(String url, User user) async {
+  Future<String?> changeUserPassword(String url, User user) async {
     Map<String, dynamic> mymap = {
       "userName": user.userName ?? '',
       "password": user.password ?? '',
@@ -42,8 +44,9 @@ class ProviderLogin extends ChangeNotifier {
           '$url/${user.id}', mymap); // Assuming user.id exists
 
       if (dataResponse.isNotEmpty) {
-        currentUser = User.fromJson(dataResponse);
-        return User.fromJson(dataResponse);
+// Extract the "message" value from the map
+        String message = dataResponse['message'];
+        return message;
       } else {
         print('Error: Empty response');
         return null;

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:untitled4/api/CRUD.dart';
 import 'package:untitled4/model/transportation_fee_model.dart';
+import 'package:untitled4/model/vehicle_model.dart';
 
 class ProviderTransportationFee extends ChangeNotifier {
   final Crud _crud = Crud();
-
+  List<Vehicle> vehicleList = [];
+  //get getVehicleList => vehicleList ;
   Future addTransporationFee(
       String url, TransportationFeeModel transportationFee) async {
     Map<String, dynamic> mymap = {
@@ -33,56 +35,39 @@ class ProviderTransportationFee extends ChangeNotifier {
     }
   }
 
-  void filterData(String searchString) {
-    notifyListeners();
+  Future<void> vehiclePrepareList(String url) async {
+    try {
+      // Make an HTTP GET request to the provided URL
+      Map<String, dynamic> dataResponse = await _crud.getRequest(url);
+
+      if (dataResponse['vehicles'] != null) {
+        List<dynamic> vehiclesData = dataResponse['vehicles'];
+        vehicleList =
+            vehiclesData.map((json) => Vehicle.fromJson(json)).toList();
+        notifyListeners();
+        print(vehicleList.toString());
+        //List<dynamic> vehicles = dataResponse['vehicles'];
+      } else {
+        // Handle the case where the server returned an error
+        print('Request failed with status: ${dataResponse.toString()}');
+        // Return or handle accordingly
+      }
+    } catch (e) {
+      // Handle exceptions that might occur during the request
+      print('Error fetching data: $e');
+      // Return or handle accordingly
+    }
   }
-
-  Future<Map<String, dynamic>> funGetResponse(String url) async {
-    return await _crud.getRequest(url); // Await the response
-  }
-
-  // Future<List<dynamic>> getUnreadNotifications(String url, String type) async {
-  //   try {
-  //     Map<String, dynamic> data_response = await funGetResponse(url);
-  //     if (data_response.isNotEmpty) {
-  //       List<NotificationModel> caseDataList =
-  //           data_response['mobileNotificationsMessagesData'] != null
-  //               ? (data_response['mobileNotificationsMessagesData'] as List)
-  //                   .map((i) {
-  //                   return NotificationModel.fromJson(i);
-  //                 }).toList()
-  //               : [];
-
-  //       if (type == "dataNotificationModel") {
-  //         dataNotificationModel = await changeDate(caseDataList);
-  //       }
-
-  //       notifyListeners();
-
-  //       return caseDataList;
-  //     } else {
-  //       print('No  found in the response.');
-  //       return []; // Return an empty list in case of no casesData
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching data: $e');
-  //     return []; // Return an empty list in case of an error
-  //   }
-  // }
-
-  deleteTempData() {
-    notifyListeners();
-  }
-
-  // Future<List<NotificationModel>> changeDate(
-  //     List<NotificationModel> currentList) async {
-  //   for (int i = 0; currentList.length - 1 > i; i++) {
-  //     currentList[i].notificationDataArabic =
-  //         await dataWithCurrentLanguage(currentList[i].notificationData!, "ar");
-  //     currentList[i].notificationDataEnglish =
-  //         await dataWithCurrentLanguage(currentList[i].notificationData!, "en");
-  //   }
-
-  //   return currentList;
-  // }
 }
+
+
+
+
+// Consumer<ProviderTransportationFee>(
+//             builder: (context, providerTransportationFee, _) {
+//               return Text(
+//                 changeTextProvider.text, // Display the text from the provider
+//                 style: TextStyle(fontSize: 18.0),
+//               );
+//             },
+//           ),

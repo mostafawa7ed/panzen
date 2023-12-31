@@ -6,6 +6,7 @@ class StaticData {
   static const String urlLogin = '${urlConnectionConst}user/login';
   static const String urlChangeUserPassword =
       '${urlConnectionConst}user/update';
+  static const String urlGetAllVehicle = '${urlConnectionConst}vehicles/all';
 //http://localhost:5000/api/transportationFee/add
 ////////////////////////// textDirection /////////////////////
 ////////////////////   Images path  //////////////////////////////////
