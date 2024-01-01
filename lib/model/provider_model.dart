@@ -1,4 +1,4 @@
-class Provider {
+class ProviderModel {
   int? iD;
   String? nAME;
   String? aDDRESS;
@@ -6,7 +6,7 @@ class Provider {
   int? cHANGERID;
   String? tIMESTAMP;
 
-  Provider(
+  ProviderModel(
       {this.iD,
       this.nAME,
       this.aDDRESS,
@@ -14,7 +14,7 @@ class Provider {
       this.cHANGERID,
       this.tIMESTAMP});
 
-  Provider.fromJson(Map<String, dynamic> json) {
+  ProviderModel.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     nAME = json['NAME'];
     aDDRESS = json['ADDRESS'];

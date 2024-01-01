@@ -27,11 +27,28 @@ dependencies:
   shared_preferences: ^2.2.0
 
 dev_dependencies:
+  arabic_font: ^0.0.9
+  data_tables: ^1.4.0
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
+  google_fonts: ^6.1.0
+  open_file: ^3.3.2
+  path_provider: ^2.1.1
+  pdf: ^3.10.7
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/static/Cairo-ExtraLight.ttf
+        - asset: assets/fonts/static/Cairo-Light.ttf
+        - asset: assets/fonts/static/Cairo-Regular.ttf
+        - asset: assets/fonts/static/Cairo-Medium.ttf
+        - asset: assets/fonts/static/Cairo-SemiBold.ttf
+        - asset: assets/fonts/static/Cairo-Bold.ttf
+        - asset: assets/fonts/static/Cairo-ExtraBold.ttf
+        - asset: assets/fonts/static/Cairo-Black.ttf
