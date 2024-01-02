@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled4/controller/providerLogin.dart';
 import 'package:untitled4/controller/provider_transportation_fee.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:untitled4/page/home.dart';
+import 'package:untitled4/page/login.dart';
 
 void main() {
   runApp(
@@ -25,6 +26,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ar'),
+      ],
+      locale: Locale("ar"),
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -47,11 +58,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final PageController controller = PageController();
   @override
   Widget build(BuildContext context) {
-    // return HomePage(
-    //   controller: controller,
-    // );
     return HomePage(
       controller: controller,
     );
+    //return LoginPage();
   }
 }

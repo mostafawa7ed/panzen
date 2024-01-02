@@ -25,12 +25,12 @@ class ProviderModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['ID'] = this.iD;
-    data['NAME'] = this.nAME;
-    data['ADDRESS'] = this.aDDRESS;
-    data['AMMOUNT_PER_TON'] = this.aMMOUNTPERTON;
-    data['CHANGER_ID'] = this.cHANGERID;
-    data['TIME_STAMP'] = this.tIMESTAMP;
+    data['ID'] = iD;
+    data['NAME'] = nAME;
+    data['ADDRESS'] = aDDRESS;
+    data['AMMOUNT_PER_TON'] = aMMOUNTPERTON;
+    data['CHANGER_ID'] = cHANGERID;
+    data['TIME_STAMP'] = tIMESTAMP;
     return data;
   }
 }

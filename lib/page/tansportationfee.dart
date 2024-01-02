@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:untitled4/cutomwidget/customAutoComplete.dart';
+import 'package:intl/intl.dart';
+import 'package:untitled4/model/driver_model.dart';
+import 'package:untitled4/model/providerDetails_model.dart';
+import 'package:adoptive_calendar/adoptive_calendar.dart';
 import 'package:untitled4/model/provider_model.dart';
 import 'package:untitled4/model/transportation_fee_model.dart';
 import 'package:untitled4/model/vehicle_model.dart';
@@ -22,19 +25,23 @@ class TransportationFee extends StatefulWidget {
 }
 
 class _TransportationFeeState extends State<TransportationFee> {
-  TextEditingController carsId = TextEditingController();
-  TextEditingController changerId = TextEditingController();
   TextEditingController numberOfTon = TextEditingController();
-  TextEditingController providersDetailsId = TextEditingController();
+
   TextEditingController requestDate = TextEditingController();
   TextEditingController totalValue = TextEditingController();
   TextEditingController _vehicleController = TextEditingController();
   TextEditingController _providerController = TextEditingController();
+  TextEditingController _providerDetailsController = TextEditingController();
+  TextEditingController _driverController = TextEditingController();
   Vehicle selectedVehicle = Vehicle();
   ProviderModel selectedProviderMOdel = ProviderModel();
+  ProviderDetails selectedProviderDetails = ProviderDetails();
+  DriverModel selectedDriver = DriverModel();
   String selected = '';
   FocusNode _vehicleFieldFocus = FocusNode();
   FocusNode _providerFieldFocus = FocusNode();
+  FocusNode _providerDetailsFieldFocus = FocusNode();
+  FocusNode _driverFieldFocus = FocusNode();
   Future<void> prepareData(BuildContext context) async {
     final ProviderTransportationFee providerTransportationFee =
         Provider.of<ProviderTransportationFee>(context, listen: false);
@@ -42,18 +49,27 @@ class _TransportationFeeState extends State<TransportationFee> {
         .vehiclePrepareList(StaticData.urlGetAllVehicle);
     await providerTransportationFee
         .providerPrepareList(StaticData.urlGetAllProviders);
+    await providerTransportationFee
+        .driverPrepareList(StaticData.urlGetAllDriver);
+
     // await providerTransportationFee.addTransporationFee(
     //               StaticData.urltransportationFeeAdd, transportationFeeModel);
   }
 
-  @override
-  void dispose() {
-    _vehicleController.dispose();
-    _providerController.dispose();
-    _vehicleFieldFocus.dispose();
-    _providerFieldFocus.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _vehicleController.dispose();
+  //   _providerController.dispose();
+  //   _providerDetailsController.dispose();
+  //   _driverController.dispose();
+  //   _vehicleFieldFocus.dispose();
+  //   _providerFieldFocus.dispose();
+  //   _vehicleFieldFocus.dispose();
+  //   _providerDetailsFieldFocus.dispose();
+  //   _driverFieldFocus.dispose();
+
+  //   super.dispose();
+  // }
 
   @override
   void initState() {
@@ -157,6 +173,7 @@ class _TransportationFeeState extends State<TransportationFee> {
               ),
             );
           }),
+          Padding(padding: EdgeInsets.only(top: 20)),
           Consumer<ProviderTransportationFee>(
               builder: (context, providerTransportationData, child) {
             return Container(
@@ -179,13 +196,20 @@ class _TransportationFeeState extends State<TransportationFee> {
                     return matches;
                   }
                 },
-                onSelected: (ProviderModel selection) {
+                onSelected: (ProviderModel selection) async {
                   selectedProviderMOdel = selection;
 
                   // Update the text in the TextFormField when a vehicle is selected
                   _providerController.text = selection.nAME ?? '';
                   print('You just selected ${selectedVehicle.nAME}');
-                  FocusScope.of(context).requestFocus(_vehicleFieldFocus);
+                  FocusScope.of(context)
+                      .requestFocus(_providerDetailsFieldFocus);
+                  final ProviderTransportationFee providerTransportationFee =
+                      Provider.of<ProviderTransportationFee>(context,
+                          listen: false);
+
+                  await providerTransportationFee.providerDetailsPrepareList(
+                      "${StaticData.urlGetAllProviderDetailsByProviderId}/${selectedProviderMOdel.iD}");
                 },
                 fieldViewBuilder: (BuildContext context,
                     TextEditingController textEditingController,
@@ -203,7 +227,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                       // Handle the submitted value, if needed
                     },
                     decoration: InputDecoration(
-                      labelText: 'Type to search Vehicle',
+                      labelText: 'Type to search provider',
                       border: OutlineInputBorder(),
                     ),
                   );
@@ -247,56 +271,268 @@ class _TransportationFeeState extends State<TransportationFee> {
               ),
             );
           }),
-          // TextField(
-          //   focusNode: _nextFieldFocus,
-          // ),
-          CustomTextFieldSearch(
-            ///asdsadsjdgs
-            controllerCaseNumber: carsId,
-            labelText: "carsId",
+          Padding(padding: EdgeInsets.only(top: 20)),
+          Consumer<ProviderTransportationFee>(
+              builder: (context, providerTransportationData, child) {
+            return Container(
+              width: getSizePage(context, 1, 60),
+              child: Autocomplete<ProviderDetails>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<ProviderDetails>.empty();
+                  } else {
+                    // Replace 'otherModelList' with your list of OtherModel objects
+                    List<ProviderDetails> matches = providerTransportationData
+                        .providerDetailsList
+                        .where((item) =>
+                            item.sTARTDATE != null &&
+                            item.sTARTDATE!
+                                .toLowerCase()
+                                .contains(textEditingValue.text.toLowerCase()))
+                        .toList();
+
+                    return matches;
+                  }
+                },
+                onSelected: (ProviderDetails selection) {
+                  selectedProviderDetails = selection;
+
+                  // Update the text in the TextFormField when a vehicle is selected
+                  _providerDetailsController.text = selection.sTARTDATE ?? '';
+                  print('You just selected ${selectedVehicle.nAME}');
+                  FocusScope.of(context).requestFocus(_driverFieldFocus);
+                },
+                fieldViewBuilder: (BuildContext context,
+                    TextEditingController textEditingController,
+                    FocusNode focusNode,
+                    VoidCallback onFieldSubmitted) {
+                  _providerDetailsController = textEditingController;
+                  _providerDetailsFieldFocus =
+                      focusNode; // Store the controller
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    onChanged: (String value) {
+                      // Additional actions while the text changes, if needed
+                    },
+                    onFieldSubmitted: (String value) {
+                      // Handle the submitted value, if needed
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Type to search provider_details',
+                      border: OutlineInputBorder(),
+                    ),
+                  );
+                },
+                optionsViewBuilder: (BuildContext context,
+                    AutocompleteOnSelected<ProviderDetails> onSelected,
+                    Iterable<ProviderDetails> options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 6.0,
+                      child: Container(
+                        constraints: BoxConstraints(maxHeight: 200.0),
+                        child: SingleChildScrollView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          child: Container(
+                            width: getSizePage(context, 1, 60),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: options.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final ProviderDetails option =
+                                    options.elementAt(index);
+                                return GestureDetector(
+                                  onTap: () {
+                                    onSelected(option);
+                                  },
+                                  child: ListTile(
+                                    title: Text(
+                                        "${option.tIMESTAMP ?? ''}  /////  ${option.eNDDATE ?? ''}  /////   ${option.aMMOUNTPERTON ?? ''} "),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }),
+          Padding(padding: EdgeInsets.only(top: 20)),
+          Consumer<ProviderTransportationFee>(
+              builder: (context, providerTransportationData, child) {
+            return Container(
+              width: getSizePage(context, 1, 60),
+              child: Autocomplete<DriverModel>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<DriverModel>.empty();
+                  } else {
+                    // Replace 'otherModelList' with your list of OtherModel objects
+                    List<DriverModel> matches = providerTransportationData
+                        .driverList
+                        .where((item) =>
+                            item.nAME != null &&
+                            item.nAME!
+                                .toLowerCase()
+                                .contains(textEditingValue.text.toLowerCase()))
+                        .toList();
+
+                    return matches;
+                  }
+                },
+                onSelected: (DriverModel selection) {
+                  selectedDriver = selection;
+
+                  // Update the text in the TextFormField when a vehicle is selected
+                  _driverController.text = selection.nAME ?? '';
+
+                  //FocusScope.of(context).requestFocus(_);
+                },
+                fieldViewBuilder: (BuildContext context,
+                    TextEditingController textEditingController,
+                    FocusNode focusNode,
+                    VoidCallback onFieldSubmitted) {
+                  _driverController = textEditingController;
+                  _driverFieldFocus = focusNode; // Store the controller
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    onChanged: (String value) {
+                      // Additional actions while the text changes, if needed
+                    },
+                    onFieldSubmitted: (String value) {
+                      // Handle the submitted value, if needed
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Type to search Driver',
+                      border: OutlineInputBorder(),
+                    ),
+                  );
+                },
+                optionsViewBuilder: (BuildContext context,
+                    AutocompleteOnSelected<DriverModel> onSelected,
+                    Iterable<DriverModel> options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 6.0,
+                      child: Container(
+                        constraints: BoxConstraints(maxHeight: 200.0),
+                        child: SingleChildScrollView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          child: Container(
+                            width: getSizePage(context, 1, 60),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: options.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final DriverModel option =
+                                    options.elementAt(index);
+                                return GestureDetector(
+                                  onTap: () {
+                                    onSelected(option);
+                                  },
+                                  child: ListTile(
+                                    title: Text(
+                                        "${option.nAME ?? ''}  /////  ${option.aDDRESS ?? ''}  /////   ${option.tIMESTAMP ?? ''} "),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }),
+          Container(
+            width: getSizePage(context, 1, 63),
+            child: CustomTextFieldSearch(
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'(^-?\d*\.?\d*)'))
+              ],
+              onChanged: (value) {
+                var inputdata = double.parse(value);
+                double caltotalValue =
+                    selectedProviderMOdel.aMMOUNTPERTON! * inputdata;
+                totalValue.text = "$caltotalValue";
+              },
+              controllerCaseNumber: numberOfTon,
+              labelText: "numberOfTon",
+            ),
           ),
-          CustomTextFieldSearch(
-            controllerCaseNumber: changerId,
-            labelText: "changerId",
+          Container(
+            width: getSizePage(context, 1, 63),
+            child: TextField(
+                controller: requestDate, //editing controller of this TextField
+                decoration: InputDecoration(
+                    icon: Icon(Icons.calendar_today), //icon of text field
+                    labelText: "lableString" //"من تاريخ" //label text of field
+                    ),
+                readOnly: true, // when true user cannot edit text
+                onTap: () async {
+                  DateTime? pickedDate = await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AdoptiveCalendar(
+                        maxYear: 2222,
+                        minYear: 1111,
+                        initialDate: DateTime.now(),
+                        use24hFormat: true,
+                      );
+                    },
+                  );
+                  // DateTime? pickedDate = await showDatePicker(
+                  //     context: context,
+                  //     initialDate: DateTime.now(), //get today's date
+                  //     firstDate: DateTime(
+                  //         2000), //DateTime.now() - not to allow to choose before today.
+                  //     lastDate: DateTime(2101));
+                  if (pickedDate != null) {
+                    String formattedDate = DateFormat('dd-MM-yyyy-hh-mm-ss').format(
+                        pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                    requestDate.text =
+                        formattedDate; //set foratted date to TextField value.
+                  } else {
+                    print("Date is not selected");
+                  }
+                }),
           ),
-          CustomTextFieldSearch(
-            controllerCaseNumber: numberOfTon,
-            labelText: "numberOfTon",
-          ),
-          CustomTextFieldSearch(
-            controllerCaseNumber: providersDetailsId,
-            labelText: "providersDetailsId",
-          ),
-          CustomTextFieldSearch(
-            controllerCaseNumber: requestDate,
-            labelText: "requestDate",
-          ),
-          CustomTextFieldSearch(
-            controllerCaseNumber: totalValue,
-            labelText: "totalValue",
+          Container(
+            width: getSizePage(context, 1, 63),
+            child: CustomTextFieldSearch(
+              controllerCaseNumber: totalValue,
+              labelText: "totalValue",
+            ),
           ),
           ElevatedButton(
               onPressed: () async {
                 TransportationFeeModel transportationFeeModel =
                     TransportationFeeModel();
-                transportationFeeModel.carsId =
-                    int.tryParse(carsId.text.toString()) ?? 1;
-                transportationFeeModel.changerId =
-                    int.tryParse(changerId.text.toString()) ?? 1;
+                transportationFeeModel.carsId = selectedVehicle.iD.toString();
+                transportationFeeModel.changerId = "1";
                 transportationFeeModel.numberOfTon =
-                    int.tryParse(numberOfTon.text.toString()) ?? 1;
+                    numberOfTon.text.toString();
                 transportationFeeModel.providersDetailsId =
-                    int.tryParse(providersDetailsId.text.toString()) ?? 1;
-                transportationFeeModel.requestDate = carsId.text.toString();
-                transportationFeeModel.totalValue =
-                    int.tryParse(totalValue.text.toString()) ?? 1;
+                    selectedProviderDetails.iD.toString();
+                transportationFeeModel.requestDate =
+                    requestDate.text.toString();
+                transportationFeeModel.totalValue = totalValue.text.toString();
                 final ProviderTransportationFee providerTransportationFee =
                     Provider.of<ProviderTransportationFee>(context,
                         listen: false);
-                File pdfFile =
-                    await generatePDF(providerTransportationFee.vehicleList);
-                // await providerTransportationFee.addTransporationFee(
-                //     StaticData.urltransportationFeeAdd, transportationFeeModel);
+
+                await providerTransportationFee.addTransporationFee(
+                    StaticData.urltransportationFeeAdd, transportationFeeModel);
                 print("object");
               },
               child: Text("أضافة")),
@@ -366,3 +602,7 @@ Future<File> generatePDF(List<Vehicle> data) async {
   OpenFile.open('${output.path}/object_list.pdf');
   return file;
 }
+
+
+// File pdfFile =
+//                     await generatePDF(providerTransportationFee.vehicleList);

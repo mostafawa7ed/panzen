@@ -8,7 +8,11 @@ class StaticData {
       '${urlConnectionConst}user/update';
   static const String urlGetAllVehicle = '${urlConnectionConst}vehicles/all';
   static const String urlGetAllProviders = '${urlConnectionConst}provider/all';
-
+  static const String urlGetAllProviderDetails =
+      '${urlConnectionConst}providerDetails/all';
+  static const String urlGetAllProviderDetailsByProviderId =
+      '${urlConnectionConst}providerDetails/provider'; //driver/all
+  static const String urlGetAllDriver = '${urlConnectionConst}driver/all';
 //http://localhost:5000/api/transportationFee/add
 ////////////////////////// textDirection /////////////////////
 ////////////////////   Images path  //////////////////////////////////

@@ -1,4 +1,4 @@
-class Driver {
+class DriverModel {
   int? iD;
   String? nAME;
   String? aDDRESS;
@@ -7,7 +7,7 @@ class Driver {
   int? cHANGERID;
   String? tIMESTAMP;
 
-  Driver(
+  DriverModel(
       {this.iD,
       this.nAME,
       this.aDDRESS,
@@ -16,7 +16,7 @@ class Driver {
       this.cHANGERID,
       this.tIMESTAMP});
 
-  Driver.fromJson(Map<String, dynamic> json) {
+  DriverModel.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     nAME = json['NAME'];
     aDDRESS = json['ADDRESS'];

@@ -1,11 +1,11 @@
 class TransportationFeeModel {
-  int? providersDetailsId;
-  int? carsId;
-  int? totalValue;
-  int? numberOfTon;
-  int? driversId;
+  String? providersDetailsId;
+  String? carsId;
+  String? totalValue;
+  String? numberOfTon;
+  String? driversId;
   String? requestDate;
-  int? changerId;
+  String? changerId;
 
   TransportationFeeModel(
       {this.providersDetailsId,

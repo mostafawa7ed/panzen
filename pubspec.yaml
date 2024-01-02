@@ -27,9 +27,11 @@ dependencies:
   shared_preferences: ^2.2.0
 
 dev_dependencies:
+  adoptive_calendar: ^0.1.0
   arabic_font: ^0.0.9
   data_tables: ^1.4.0
   flutter_lints: ^2.0.0
+  flutter_localization: ^0.1.14
   flutter_test:
     sdk: flutter
   google_fonts: ^6.1.0
