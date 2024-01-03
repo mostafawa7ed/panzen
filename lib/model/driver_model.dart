@@ -1,40 +1,40 @@
 class DriverModel {
-  int? iD;
-  String? nAME;
-  String? aDDRESS;
-  String? fIRSTNAME;
-  String? sECONDNAME;
-  int? cHANGERID;
-  String? tIMESTAMP;
+  int? iDD;
+  String? nAMED;
+  String? aDDRESSD;
+  String? fIRSTNAMED;
+  String? sECONDNAMED;
+  int? cHANGERIDD;
+  String? tIMESTAMPD;
 
   DriverModel(
-      {this.iD,
-      this.nAME,
-      this.aDDRESS,
-      this.fIRSTNAME,
-      this.sECONDNAME,
-      this.cHANGERID,
-      this.tIMESTAMP});
+      {this.iDD,
+      this.nAMED,
+      this.aDDRESSD,
+      this.fIRSTNAMED,
+      this.sECONDNAMED,
+      this.cHANGERIDD,
+      this.tIMESTAMPD});
 
   DriverModel.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
-    nAME = json['NAME'];
-    aDDRESS = json['ADDRESS'];
-    fIRSTNAME = json['FIRST_NAME'];
-    sECONDNAME = json['SECOND_NAME'];
-    cHANGERID = json['CHANGER_ID'];
-    tIMESTAMP = json['TIME_STAMP'];
+    iDD = json['ID'];
+    nAMED = json['NAME'];
+    aDDRESSD = json['ADDRESS'];
+    fIRSTNAMED = json['FIRST_NAME'];
+    sECONDNAMED = json['SECOND_NAME'];
+    cHANGERIDD = json['CHANGER_ID'];
+    tIMESTAMPD = json['TIME_STAMP'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['ID'] = this.iD;
-    data['NAME'] = this.nAME;
-    data['ADDRESS'] = this.aDDRESS;
-    data['FIRST_NAME'] = this.fIRSTNAME;
-    data['SECOND_NAME'] = this.sECONDNAME;
-    data['CHANGER_ID'] = this.cHANGERID;
-    data['TIME_STAMP'] = this.tIMESTAMP;
+    data['ID'] = this.iDD;
+    data['NAME'] = this.nAMED;
+    data['ADDRESS'] = this.aDDRESSD;
+    data['FIRST_NAME'] = this.fIRSTNAMED;
+    data['SECOND_NAME'] = this.sECONDNAMED;
+    data['CHANGER_ID'] = this.cHANGERIDD;
+    data['TIME_STAMP'] = this.tIMESTAMPD;
     return data;
   }
 }

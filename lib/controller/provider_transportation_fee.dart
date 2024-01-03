@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:untitled4/api/CRUD.dart';
 import 'package:untitled4/model/driver_model.dart';
 import 'package:untitled4/model/providerDetails_model.dart';
@@ -12,18 +13,39 @@ class ProviderTransportationFee extends ChangeNotifier {
   List<ProviderModel> providerList = [];
   List<ProviderDetails> providerDetailsList = [];
   List<DriverModel> driverList = [];
+  Text message = Text("");
   double totalvalue = 0.0;
   Future addTransporationFee(
       String url, TransportationFeeModel transportationFee) async {
+    // int? parsedInt = int.tryParse(numberAsString);
+    //         double? parsedDouble = double.tryParse(numberAsString);
+    String originalDateString = transportationFee.requestDate!;
+    List<String> dateParts = originalDateString.split('-');
+
+    // Assuming the format is DD-MM-YYYY-HH-mm-ss
+    int day = int.parse(dateParts[0]);
+    int month = int.parse(dateParts[1]);
+    int year = int.parse(dateParts[2]);
+    int hour = int.parse(dateParts[3]);
+    int minute = int.parse(dateParts[4]);
+    int second = int.parse(dateParts[5]);
+
+    DateTime dateTime = DateTime(year, month, day, hour, minute, second);
+
+    // Format DateTime to ISO 8601 string
+    String iso8601String = DateFormat('yyyy-MM-ddTHH:mm:ss').format(dateTime);
+
+    // Now 'iso8601String' contains the date in ISO 8601 format
+    print(iso8601String);
     Map<String, dynamic> mymap = {
-      "providersDetailsId": transportationFee.providersDetailsId ?? 1,
-      "driversId": transportationFee.driversId ?? 1,
-      "carsId": transportationFee.carsId ?? 1,
-      "totalValue": transportationFee.totalValue ?? 1,
-      "numberOfTon": transportationFee.numberOfTon ?? 1,
-      "requestDate":
-          DateTime.now().toIso8601String().substring(0, 10).toString(),
-      "changerId": transportationFee.changerId ?? 1
+      "providersDetailsId":
+          int.tryParse(transportationFee.providersDetailsId!) ?? 1,
+      "driversId": int.tryParse(transportationFee.driversId!) ?? 1,
+      "carsId": int.tryParse(transportationFee.carsId!) ?? 1,
+      "totalValue": double.tryParse(transportationFee.totalValue!) ?? 1,
+      "numberOfTon": double.tryParse(transportationFee.numberOfTon!) ?? 1,
+      "requestDate": iso8601String,
+      "changerId": int.tryParse(transportationFee.changerId!) ?? 1
     };
     try {
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, mymap);
@@ -114,7 +136,7 @@ class ProviderTransportationFee extends ChangeNotifier {
     }
   }
 
-  Future<void> driverPrepareList(String url) async {
+  Future<List<DriverModel>> driverPrepareList(String url) async {
     try {
       // Make an HTTP GET request to the provided URL
       Map<String, dynamic> dataResponse = await _crud.getRequest(url);
@@ -124,21 +146,29 @@ class ProviderTransportationFee extends ChangeNotifier {
         driverList = data.map((json) => DriverModel.fromJson(json)).toList();
         notifyListeners();
         print(driverList.toString());
+        return driverList;
         //List<dynamic> vehicles = dataResponse['vehicles'];
       } else {
         // Handle the case where the server returned an error
         print('Request failed with status: ${dataResponse.toString()}');
+        return [];
         // Return or handle accordingly
       }
     } catch (e) {
       // Handle exceptions that might occur during the request
       print('Error fetching data: $e');
       // Return or handle accordingly
+      return [];
     }
   }
 
   void changeTotalValue(double value) {
     totalvalue = value;
+    notifyListeners();
+  }
+
+  void changeMessage(Text m) {
+    message = m;
     notifyListeners();
   }
 }

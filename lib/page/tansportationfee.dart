@@ -6,6 +6,7 @@ import 'package:untitled4/model/providerDetails_model.dart';
 import 'package:adoptive_calendar/adoptive_calendar.dart';
 import 'package:untitled4/model/provider_model.dart';
 import 'package:untitled4/model/transportation_fee_model.dart';
+import 'package:untitled4/model/user_model.dart';
 import 'package:untitled4/model/vehicle_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +19,8 @@ import 'package:untitled4/functions/mediaquery.dart';
 import 'package:open_file/open_file.dart';
 
 class TransportationFee extends StatefulWidget {
-  const TransportationFee({super.key});
-
+  const TransportationFee({super.key, required this.user});
+  final User user;
   @override
   State<TransportationFee> createState() => _TransportationFeeState();
 }
@@ -29,19 +30,24 @@ class _TransportationFeeState extends State<TransportationFee> {
 
   TextEditingController requestDate = TextEditingController();
   TextEditingController totalValue = TextEditingController();
+
   TextEditingController _vehicleController = TextEditingController();
   TextEditingController _providerController = TextEditingController();
   TextEditingController _providerDetailsController = TextEditingController();
   TextEditingController _driverController = TextEditingController();
+
   Vehicle selectedVehicle = Vehicle();
   ProviderModel selectedProviderMOdel = ProviderModel();
   ProviderDetails selectedProviderDetails = ProviderDetails();
   DriverModel selectedDriver = DriverModel();
-  String selected = '';
+
   FocusNode _vehicleFieldFocus = FocusNode();
   FocusNode _providerFieldFocus = FocusNode();
   FocusNode _providerDetailsFieldFocus = FocusNode();
   FocusNode _driverFieldFocus = FocusNode();
+
+  String selected = '';
+
   Future<void> prepareData(BuildContext context) async {
     final ProviderTransportationFee providerTransportationFee =
         Provider.of<ProviderTransportationFee>(context, listen: false);
@@ -377,8 +383,8 @@ class _TransportationFeeState extends State<TransportationFee> {
                     List<DriverModel> matches = providerTransportationData
                         .driverList
                         .where((item) =>
-                            item.nAME != null &&
-                            item.nAME!
+                            item.nAMED != null &&
+                            item.nAMED!
                                 .toLowerCase()
                                 .contains(textEditingValue.text.toLowerCase()))
                         .toList();
@@ -390,16 +396,18 @@ class _TransportationFeeState extends State<TransportationFee> {
                   selectedDriver = selection;
 
                   // Update the text in the TextFormField when a vehicle is selected
-                  _driverController.text = selection.nAME ?? '';
-
-                  //FocusScope.of(context).requestFocus(_);
+                  _driverController.text = selection.nAMED ?? '';
+                  print('You just selected ${selection.nAMED}');
+                  FocusScope.of(context)
+                      .requestFocus(_providerDetailsFieldFocus);
                 },
                 fieldViewBuilder: (BuildContext context,
                     TextEditingController textEditingController,
                     FocusNode focusNode,
                     VoidCallback onFieldSubmitted) {
                   _driverController = textEditingController;
-                  _driverFieldFocus = focusNode; // Store the controller
+                  _driverFieldFocus = focusNode;
+                  //Store the controller
                   return TextFormField(
                     controller: textEditingController,
                     focusNode: focusNode,
@@ -440,7 +448,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                                   },
                                   child: ListTile(
                                     title: Text(
-                                        "${option.nAME ?? ''}  /////  ${option.aDDRESS ?? ''}  /////   ${option.tIMESTAMP ?? ''} "),
+                                        "${option.iDD ?? ''} //// ${option.fIRSTNAMED ?? ''} ///// ${option.aDDRESSD ?? ''} ///// ${option.tIMESTAMPD ?? ''} "),
                                   ),
                                 );
                               },
@@ -516,24 +524,45 @@ class _TransportationFeeState extends State<TransportationFee> {
           ),
           ElevatedButton(
               onPressed: () async {
-                TransportationFeeModel transportationFeeModel =
-                    TransportationFeeModel();
-                transportationFeeModel.carsId = selectedVehicle.iD.toString();
-                transportationFeeModel.changerId = "1";
-                transportationFeeModel.numberOfTon =
-                    numberOfTon.text.toString();
-                transportationFeeModel.providersDetailsId =
-                    selectedProviderDetails.iD.toString();
-                transportationFeeModel.requestDate =
-                    requestDate.text.toString();
-                transportationFeeModel.totalValue = totalValue.text.toString();
                 final ProviderTransportationFee providerTransportationFee =
                     Provider.of<ProviderTransportationFee>(context,
                         listen: false);
+                if (selectedVehicle.iD == null &&
+                    numberOfTon.text == "" &&
+                    selectedProviderDetails.iD == null &&
+                    requestDate.text == "" &&
+                    totalValue.text == "" &&
+                    selectedDriver.iDD == null) {
+                  providerTransportationFee.changeMessage(Text(
+                    "faild",
+                    style: TextStyle(color: Colors.red),
+                  ));
+                } else {
+                  TransportationFeeModel transportationFeeModel =
+                      TransportationFeeModel();
+                  transportationFeeModel.carsId = selectedVehicle.iD.toString();
+                  transportationFeeModel.changerId =
+                      widget.user.id.toString(); //widget.user.id
+                  transportationFeeModel.numberOfTon =
+                      numberOfTon.text.toString();
+                  transportationFeeModel.providersDetailsId =
+                      selectedProviderDetails.iD.toString();
+                  transportationFeeModel.requestDate =
+                      requestDate.text.toString();
+                  transportationFeeModel.totalValue =
+                      totalValue.text.toString();
+                  transportationFeeModel.driversId =
+                      selectedDriver.iDD.toString();
 
-                await providerTransportationFee.addTransporationFee(
-                    StaticData.urltransportationFeeAdd, transportationFeeModel);
-                print("object");
+                  await providerTransportationFee.addTransporationFee(
+                      StaticData.urltransportationFeeAdd,
+                      transportationFeeModel);
+                  providerTransportationFee.changeMessage(Text("success",
+                      style: TextStyle(
+                        color: Colors.green,
+                      )));
+                  print("object");
+                }
               },
               child: Text("أضافة")),
         ],

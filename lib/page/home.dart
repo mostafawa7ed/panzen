@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:untitled4/controller/provider_transportation_fee.dart';
+import 'package:untitled4/model/user_model.dart';
 
 import 'package:untitled4/page/tansportationfee.dart';
 
@@ -6,8 +9,9 @@ class HomePage extends StatelessWidget {
   const HomePage({
     super.key,
     required this.controller,
+    required this.user,
   });
-
+  final User user;
   final PageController controller;
 
   @override
@@ -35,9 +39,10 @@ class HomePage extends StatelessWidget {
         ),
         Column(
           children: [
-            const Center(
-              child: Text("message"),
-            ),
+            Center(child: Consumer<ProviderTransportationFee>(
+                builder: (context, providerTransportationData, child) {
+              return providerTransportationData.message;
+            })),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -93,6 +98,7 @@ class HomePage extends StatelessWidget {
               ],
             ),
             CustomPageView(
+              user: user,
               controller: controller,
             ),
           ],
@@ -103,8 +109,9 @@ class HomePage extends StatelessWidget {
 }
 
 class CustomPageView extends StatelessWidget {
-  const CustomPageView({super.key, required this.controller});
-
+  const CustomPageView(
+      {super.key, required this.controller, required this.user});
+  final User user;
   final PageController controller;
 
   @override
@@ -115,8 +122,8 @@ class CustomPageView extends StatelessWidget {
         /// [PageView.scrollDirection] defaults to [Axis.horizontal].
         /// Use [Axis.vertical] to scroll vertically.
         controller: controller,
-        children: const <Widget>[
-          TransportationFee(),
+        children: <Widget>[
+          TransportationFee(user: user),
           Center(
             child: Text('Second Page'),
           ),

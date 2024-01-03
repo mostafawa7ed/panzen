@@ -55,12 +55,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final PageController controller = PageController();
   @override
   Widget build(BuildContext context) {
-    return HomePage(
-      controller: controller,
-    );
-    //return LoginPage();
+    // return HomePage(
+    //   controller: controller,
+    // );
+    return LoginPage();
   }
 }

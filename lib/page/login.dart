@@ -6,6 +6,7 @@ import 'package:untitled4/controller/providerLogin.dart';
 import 'package:untitled4/data/staticdata.dart';
 import 'package:untitled4/functions/mediaquery.dart';
 import 'package:untitled4/model/user_model.dart';
+import 'package:untitled4/page/home.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _showChangePassword = false;
   final _formKey = GlobalKey<FormState>();
+  final PageController controller = PageController();
   late String _email;
   late String _password;
   TextEditingController userName = TextEditingController();
@@ -172,8 +174,14 @@ class _LoginPageState extends State<LoginPage> {
                               User? loginUser = await providerLogin.login(
                                   StaticData.urlLogin, user);
                               if (loginUser != null) {
-                                print('Email: $_email');
-                                print('Password: $_password');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomePage(
+                                            user: loginUser,
+                                            controller: controller,
+                                          )),
+                                );
                               } else {
                                 print('Faild login');
                               }
@@ -255,6 +263,9 @@ class _LoginPageState extends State<LoginPage> {
                                                     StaticData
                                                         .urlChangeUserPassword,
                                                     user);
+                                        setState(() {
+                                          _showChangePassword = false;
+                                        });
                                         SnackBar snackBar = SnackBar(
                                           content: Center(
                                               child: Text(
