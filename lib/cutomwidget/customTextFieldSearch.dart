@@ -9,6 +9,7 @@ class CustomTextFieldSearch extends StatelessWidget {
     this.onChanged,
     this.keyboardType,
     this.inputFormatters,
+    this.focusNode,
   }) : _controllerCaseNumber = controllerCaseNumber;
 
   final TextEditingController _controllerCaseNumber;
@@ -16,12 +17,14 @@ class CustomTextFieldSearch extends StatelessWidget {
   final void Function(String)? onChanged;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
     return Container(
         padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: TextField(
+          focusNode: focusNode,
           inputFormatters: inputFormatters,
           keyboardType: keyboardType,
           controller: _controllerCaseNumber,

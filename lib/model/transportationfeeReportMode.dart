@@ -1,4 +1,4 @@
-class SelectedData {
+class TransportaionfeeReport {
   int? transportationFeeId;
   String? driverName;
   String? driverAddress;
@@ -15,7 +15,7 @@ class SelectedData {
   String? requestDate;
   String? timeStamp;
 
-  SelectedData(
+  TransportaionfeeReport(
       {this.transportationFeeId,
       this.driverName,
       this.driverAddress,
@@ -32,7 +32,7 @@ class SelectedData {
       this.requestDate,
       this.timeStamp});
 
-  SelectedData.fromJson(Map<String, dynamic> json) {
+  TransportaionfeeReport.fromJson(Map<String, dynamic> json) {
     transportationFeeId = json['transportation_fee_id'];
     driverName = json['driver_name'];
     driverAddress = json['driver_address'];

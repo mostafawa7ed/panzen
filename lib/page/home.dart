@@ -1,110 +1,306 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled4/controller/provider_transportation_fee.dart';
 import 'package:untitled4/model/user_model.dart';
+import 'package:untitled4/page/login.dart';
+import 'package:untitled4/page/signup.dart';
 
 import 'package:untitled4/page/tansportationfee.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({
+import '../data/langaue.dart';
+import 'reportPage.dart';
+
+class HomePage extends StatefulWidget {
+  HomePage({
     super.key,
     required this.controller,
     required this.user,
+    required this.language,
   });
   final User user;
   final PageController controller;
+  final String language;
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<HomePage> {
+  int indexPage = 0;
+  late Timer _timer;
+  int _seconds = 60 * 60 * 2;
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_seconds == 0) {
+          setState(() {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LoginPage(
+                        Language: widget.language,
+                      )),
+            );
+            timer.cancel();
+          });
+        } else {
+          setState(() {
+            _seconds--;
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    Timer.periodic(const Duration(hours: 2), (timer) {
+      print(DateTime.now());
+    });
+    startTimer();
+    super.initState();
+  }
+
+  String getTimerText() {
+    int hours = (_seconds ~/ 3600);
+    int minutes = (_seconds % 3600) ~/ 60;
+    int seconds = _seconds % 60;
+
+    String hoursStr = (hours < 10) ? '0$hours' : '$hours';
+    String minutesStr = (minutes < 10) ? '0$minutes' : '$minutes';
+    String secondsStr = (seconds < 10) ? '0$seconds' : '$seconds';
+
+    return '$hoursStr:$minutesStr:$secondsStr            ';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: [
-        ClipPath(
-          clipper: WaveClipper(),
-          child: Container(
-            padding: const EdgeInsets.only(bottom: 450),
-            color: Colors.blue.withOpacity(.8),
-            height: 220,
-            alignment: Alignment.center,
+        appBar: AppBar(
+          leading: Text(
+            style: const TextStyle(fontSize: 20.0),
+            widget.user.name ?? "",
           ),
-        ),
-        ClipPath(
-          clipper: WaveClipper(waveDeep: 0, waveDeep2: 100),
-          child: Container(
-            padding: const EdgeInsets.only(bottom: 50),
-            color: Colors.blue.withOpacity(.3),
-            height: 180,
-            alignment: Alignment.center,
-          ),
-        ),
-        Column(
-          children: [
-            Center(child: Consumer<ProviderTransportationFee>(
-                builder: (context, providerTransportationData, child) {
-              return providerTransportationData.message;
-            })),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        controller.animateToPage(
-                          0,
-                          duration: const Duration(milliseconds: 50),
-                          curve: Curves.easeIn,
-                        );
-                      },
-                      child: const Text("اضافة حمولة منقولة")),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        controller.animateToPage(
-                          1,
-                          duration: const Duration(milliseconds: 50),
-                          curve: Curves.easeIn,
-                        );
-                      },
-                      child: const Text("next")),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        controller.animateToPage(
-                          2,
-                          duration: const Duration(milliseconds: 50),
-                          curve: Curves.easeIn,
-                        );
-                      },
-                      child: const Text("next")),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        controller.animateToPage(
-                          3,
-                          duration: const Duration(milliseconds: 50),
-                          curve: Curves.easeIn,
-                        );
-                      },
-                      child: const Text("next")),
-                ),
-              ],
+          actions: [
+            Visibility(
+              visible: widget.user.userName == 'admin',
+              child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SignUp(
+                                user: widget.user,
+                                pageController: widget.controller,
+                                language: widget.language,
+                              )),
+                    );
+                  },
+                  child: Text(getLanguage(context, 'addNewUser'))),
             ),
-            CustomPageView(
-              user: user,
-              controller: controller,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                getTimerText(),
+                style: const TextStyle(fontSize: 16.0),
+              ),
             ),
           ],
         ),
-      ],
-    ));
+        body: Stack(
+          children: [
+            ClipPath(
+              clipper: WaveClipper(),
+              child: Container(
+                padding: const EdgeInsets.only(bottom: 450),
+                color: Colors.blue.withOpacity(.8),
+                height: 220,
+                alignment: Alignment.center,
+              ),
+            ),
+            ClipPath(
+              clipper: WaveClipper(waveDeep: 0, waveDeep2: 100),
+              child: Container(
+                padding: const EdgeInsets.only(bottom: 50),
+                color: Colors.blue.withOpacity(.3),
+                height: 180,
+                alignment: Alignment.center,
+              ),
+            ),
+            Column(
+              children: [
+                Center(child: Consumer<ProviderTransportationFee>(
+                    builder: (context, providerTransportationData, child) {
+                  return providerTransportationData.message;
+                })),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          style: indexPage == 0
+                              ? ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange[300],
+                                  elevation: 5,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                )
+                              : null,
+                          onPressed: () {
+                            setState(() {
+                              indexPage = 0;
+                            });
+                            widget.controller.animateToPage(
+                              0,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeIn,
+                            );
+                          },
+                          child: Text(
+                            getLanguage(context, 'addDriver'),
+                          ), //addDriver
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            style: indexPage == 1
+                                ? ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange[300],
+                                    elevation: 5,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )
+                                : null,
+                            onPressed: () {
+                              setState(() {
+                                indexPage = 1;
+                              });
+
+                              widget.controller.animateToPage(
+                                1,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              );
+                            },
+                            child: Text(getLanguage(context, 'addvehicle'))),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            style: indexPage == 2
+                                ? ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange[300],
+                                    elevation: 5,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )
+                                : null,
+                            onPressed: () {
+                              setState(() {
+                                indexPage = 2;
+                              });
+                              widget.controller.animateToPage(
+                                2,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              );
+                            },
+                            child: Text(getLanguage(context, 'addprovider'))),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            style: indexPage == 3
+                                ? ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange[300],
+                                    elevation: 5,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )
+                                : null,
+                            onPressed: () {
+                              setState(() {
+                                indexPage = 3;
+                              });
+                              widget.controller.animateToPage(
+                                3,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              );
+                            },
+                            child: Text(
+                                getLanguage(context, 'addTransportationFee'))),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            style: indexPage == 4
+                                ? ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange[300],
+                                    elevation: 5,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )
+                                : null,
+                            onPressed: () {
+                              setState(() {
+                                indexPage = 4;
+                              });
+                              widget.controller.animateToPage(
+                                4,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              );
+                            },
+                            child: Text(getLanguage(context, 'report'))),
+                      ),
+                    ),
+                  ],
+                ),
+                CustomPageView(
+                  user: widget.user,
+                  controller: widget.controller,
+                ),
+              ],
+            ),
+          ],
+        ));
   }
 }
 
@@ -123,16 +319,17 @@ class CustomPageView extends StatelessWidget {
         /// Use [Axis.vertical] to scroll vertically.
         controller: controller,
         children: <Widget>[
-          TransportationFee(user: user),
-          Center(
+          const Center(
+            child: Text('first Page'),
+          ),
+          const Center(
             child: Text('Second Page'),
           ),
-          Center(
-            child: Text('Third Page'),
+          const Center(
+            child: Text('thid Page'),
           ),
-          Center(
-            child: Text('Four Page'),
-          ),
+          TransportationFee(user: user),
+          const ReportTap(),
         ],
       ),
     );

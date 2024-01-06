@@ -18,6 +18,8 @@ import 'package:untitled4/data/staticdata.dart';
 import 'package:untitled4/functions/mediaquery.dart';
 import 'package:open_file/open_file.dart';
 
+import '../data/langaue.dart';
+
 class TransportationFee extends StatefulWidget {
   const TransportationFee({super.key, required this.user});
   final User user;
@@ -27,10 +29,8 @@ class TransportationFee extends StatefulWidget {
 
 class _TransportationFeeState extends State<TransportationFee> {
   TextEditingController numberOfTon = TextEditingController();
-
   TextEditingController requestDate = TextEditingController();
   TextEditingController totalValue = TextEditingController();
-
   TextEditingController _vehicleController = TextEditingController();
   TextEditingController _providerController = TextEditingController();
   TextEditingController _providerDetailsController = TextEditingController();
@@ -45,6 +45,7 @@ class _TransportationFeeState extends State<TransportationFee> {
   FocusNode _providerFieldFocus = FocusNode();
   FocusNode _providerDetailsFieldFocus = FocusNode();
   FocusNode _driverFieldFocus = FocusNode();
+  FocusNode _numberTonFieldFocus = FocusNode();
 
   String selected = '';
 
@@ -80,6 +81,10 @@ class _TransportationFeeState extends State<TransportationFee> {
   @override
   void initState() {
     prepareData(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(_vehicleFieldFocus);
+    });
+
     super.initState();
   }
 
@@ -136,7 +141,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                       // Handle the submitted value, if needed
                     },
                     decoration: InputDecoration(
-                      labelText: 'Type to search Vehicle',
+                      labelText: getLanguage(context, 'typeToSearchVehicle'),
                       border: OutlineInputBorder(),
                     ),
                   );
@@ -233,7 +238,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                       // Handle the submitted value, if needed
                     },
                     decoration: InputDecoration(
-                      labelText: 'Type to search provider',
+                      labelText: getLanguage(context, 'typeToSearchProvider'),
                       border: OutlineInputBorder(),
                     ),
                   );
@@ -325,7 +330,8 @@ class _TransportationFeeState extends State<TransportationFee> {
                       // Handle the submitted value, if needed
                     },
                     decoration: InputDecoration(
-                      labelText: 'Type to search provider_details',
+                      labelText:
+                          getLanguage(context, 'typeToSearchProviderDerails'),
                       border: OutlineInputBorder(),
                     ),
                   );
@@ -398,8 +404,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                   // Update the text in the TextFormField when a vehicle is selected
                   _driverController.text = selection.nAMED ?? '';
                   print('You just selected ${selection.nAMED}');
-                  FocusScope.of(context)
-                      .requestFocus(_providerDetailsFieldFocus);
+                  FocusScope.of(context).requestFocus(_numberTonFieldFocus);
                 },
                 fieldViewBuilder: (BuildContext context,
                     TextEditingController textEditingController,
@@ -418,7 +423,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                       // Handle the submitted value, if needed
                     },
                     decoration: InputDecoration(
-                      labelText: 'Type to search Driver',
+                      labelText: getLanguage(context, 'typeToSearchDriver'),
                       border: OutlineInputBorder(),
                     ),
                   );
@@ -465,6 +470,7 @@ class _TransportationFeeState extends State<TransportationFee> {
           Container(
             width: getSizePage(context, 1, 63),
             child: CustomTextFieldSearch(
+              focusNode: _numberTonFieldFocus,
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'(^-?\d*\.?\d*)'))
               ],
@@ -475,7 +481,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                 totalValue.text = "$caltotalValue";
               },
               controllerCaseNumber: numberOfTon,
-              labelText: "numberOfTon",
+              labelText: getLanguage(context, 'numberOfTon'),
             ),
           ),
           Container(
@@ -483,9 +489,9 @@ class _TransportationFeeState extends State<TransportationFee> {
             child: TextField(
                 controller: requestDate, //editing controller of this TextField
                 decoration: InputDecoration(
-                    icon: Icon(Icons.calendar_today), //icon of text field
-                    labelText: "lableString" //"من تاريخ" //label text of field
-                    ),
+                  icon: Icon(Icons.calendar_today), //icon of text field
+                  labelText: getLanguage(context, 'dateRequest'),
+                ),
                 readOnly: true, // when true user cannot edit text
                 onTap: () async {
                   DateTime? pickedDate = await showDialog(
@@ -499,12 +505,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                       );
                     },
                   );
-                  // DateTime? pickedDate = await showDatePicker(
-                  //     context: context,
-                  //     initialDate: DateTime.now(), //get today's date
-                  //     firstDate: DateTime(
-                  //         2000), //DateTime.now() - not to allow to choose before today.
-                  //     lastDate: DateTime(2101));
+
                   if (pickedDate != null) {
                     String formattedDate = DateFormat('dd-MM-yyyy-hh-mm-ss').format(
                         pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
@@ -519,7 +520,7 @@ class _TransportationFeeState extends State<TransportationFee> {
             width: getSizePage(context, 1, 63),
             child: CustomTextFieldSearch(
               controllerCaseNumber: totalValue,
-              labelText: "totalValue",
+              labelText: getLanguage(context, 'totalValue'),
             ),
           ),
           ElevatedButton(
@@ -534,8 +535,11 @@ class _TransportationFeeState extends State<TransportationFee> {
                     totalValue.text == "" &&
                     selectedDriver.iDD == null) {
                   providerTransportationFee.changeMessage(Text(
-                    "faild",
-                    style: TextStyle(color: Colors.red),
+                    getLanguage(context, 'messageFaild'),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Color.fromARGB(255, 158, 62, 55)),
                   ));
                 } else {
                   TransportationFeeModel transportationFeeModel =
@@ -557,14 +561,28 @@ class _TransportationFeeState extends State<TransportationFee> {
                   await providerTransportationFee.addTransporationFee(
                       StaticData.urltransportationFeeAdd,
                       transportationFeeModel);
-                  providerTransportationFee.changeMessage(Text("success",
-                      style: TextStyle(
-                        color: Colors.green,
-                      )));
-                  print("object");
+                  providerTransportationFee.changeMessage(Text(
+                    getLanguage(context, 'messageSuccess'),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Color.fromARGB(255, 31, 124, 19)),
+                  ));
+
+                  numberOfTon.clear();
+                  requestDate.clear();
+                  totalValue.clear();
+                  _vehicleController.clear();
+                  _providerController.clear();
+                  _providerDetailsController.clear();
+                  _driverController.clear();
+                  selectedVehicle = Vehicle();
+                  selectedProviderMOdel = ProviderModel();
+                  selectedProviderDetails = ProviderDetails();
+                  selectedDriver = DriverModel();
                 }
               },
-              child: Text("أضافة")),
+              child: Text(getLanguage(context, 'addTransportation'))),
         ],
       ),
     );

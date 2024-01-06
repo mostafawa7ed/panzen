@@ -2,14 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled4/controller/providerLogin.dart';
+import 'package:untitled4/data/langaue.dart';
 import 'package:untitled4/data/staticdata.dart';
 import 'package:untitled4/functions/mediaquery.dart';
 import 'package:untitled4/model/user_model.dart';
 import 'package:untitled4/page/home.dart';
+import 'package:untitled4/main.dart' as mainApp;
 
 class LoginPage extends StatefulWidget {
   @override
+  const LoginPage({super.key, required this.Language});
+  final String Language;
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -23,8 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController password = TextEditingController();
   TextEditingController newPassword = TextEditingController();
   TextEditingController rewriteNewPassword = TextEditingController();
-  late Timer _timer;
-  int _seconds = 60; // Initial time in seconds
+  // Initial time in seconds
   bool _showPassword = false;
   void _togglePasswordVisibility() {
     setState(() {
@@ -33,53 +37,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void startTimer() {
-    const oneSec = const Duration(seconds: 1);
-    _timer = Timer.periodic(
-      oneSec,
-      (Timer timer) {
-        if (_seconds == 0) {
-          setState(() {
-            timer.cancel();
-          });
-        } else {
-          setState(() {
-            _seconds--;
-          });
-        }
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    Timer.periodic(Duration(hours: 2), (timer) {
-      print(DateTime.now());
-    });
-    startTimer();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login Page'),
-        centerTitle: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Time Left: $_seconds seconds',
-              style: TextStyle(fontSize: 16.0),
-            ),
+          ElevatedButton(
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              if (widget.Language == 'ar') {
+                prefs.setString('language', 'en');
+              } else {
+                prefs.setString('language', 'ar');
+              }
+              mainApp.main();
+            },
+            child: widget.Language == 'ar'
+                ? Text("Change To English")
+                : Text("تغير إلي العربي"),
           ),
         ],
+        title: Text(getLanguage(context, 'pageLogin')),
+        centerTitle: true,
       ),
       body: Stack(
         children: [
@@ -105,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
             alignment: Alignment.center,
             child: SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Container(
                   width: getSizePage(context, 1, 50),
                   child: Form(
@@ -117,8 +95,8 @@ class _LoginPageState extends State<LoginPage> {
                         TextFormField(
                           controller: userName,
                           decoration: InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
+                            labelText: getLanguage(context, 'userName'),
+                            border: const OutlineInputBorder(),
                             fillColor: Colors.white38,
                             filled: true,
                           ),
@@ -132,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                             _email = value!;
                           },
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         TextFormField(
                           controller: password,
                           decoration: InputDecoration(
@@ -146,8 +124,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             fillColor: Colors.white38,
                             filled: true,
-                            labelText: 'Password',
-                            border: OutlineInputBorder(),
+                            labelText: getLanguage(context, 'password'),
+                            border: const OutlineInputBorder(),
                           ),
                           obscureText: _showPassword,
                           validator: (value) {
@@ -160,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                             _password = value!;
                           },
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
@@ -174,12 +152,13 @@ class _LoginPageState extends State<LoginPage> {
                               User? loginUser = await providerLogin.login(
                                   StaticData.urlLogin, user);
                               if (loginUser != null) {
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => HomePage(
                                             user: loginUser,
                                             controller: controller,
+                                            language: widget.Language,
                                           )),
                                 );
                               } else {
@@ -187,11 +166,11 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             }
                           },
-                          child: Text('Login'),
+                          child: Text(getLanguage(context, 'login')),
                         ),
                         SingleChildScrollView(
                           child: Padding(
-                            padding: EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(16.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: <Widget>[
@@ -201,9 +180,10 @@ class _LoginPageState extends State<LoginPage> {
                                       _showChangePassword = true;
                                     });
                                   },
-                                  child: Text('Change Password'),
+                                  child: Text(
+                                      getLanguage(context, 'changePassword')),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 if (_showChangePassword) ...[
                                   TextFormField(
                                     controller: newPassword,
@@ -216,12 +196,13 @@ class _LoginPageState extends State<LoginPage> {
                                               : Icons.visibility_off,
                                         ),
                                       ),
-                                      labelText: 'New Password',
-                                      border: OutlineInputBorder(),
+                                      labelText:
+                                          getLanguage(context, 'newPassword'),
+                                      border: const OutlineInputBorder(),
                                     ),
                                     obscureText: _showPassword,
                                   ),
-                                  SizedBox(height: 20),
+                                  const SizedBox(height: 20),
                                   TextFormField(
                                     controller: rewriteNewPassword,
                                     decoration: InputDecoration(
@@ -233,12 +214,13 @@ class _LoginPageState extends State<LoginPage> {
                                               : Icons.visibility_off,
                                         ),
                                       ),
-                                      labelText: 'Re-enter New Password',
-                                      border: OutlineInputBorder(),
+                                      labelText:
+                                          getLanguage(context, 'renewPassword'),
+                                      border: const OutlineInputBorder(),
                                     ),
                                     obscureText: _showPassword,
                                   ),
-                                  SizedBox(height: 20),
+                                  const SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: () async {
                                       User user = User();
@@ -281,7 +263,8 @@ class _LoginPageState extends State<LoginPage> {
                                         }
                                       }
                                     },
-                                    child: Text('Save'),
+                                    child: Text(
+                                        getLanguage(context, 'savepassword')),
                                   ),
                                 ],
                               ],

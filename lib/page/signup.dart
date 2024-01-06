@@ -1,225 +1,379 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:untitled4/controller/providerLogin.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+import 'package:untitled4/cutomwidget/customTextFaild.dart';
+import 'package:untitled4/data/staticdata.dart';
 
+import 'package:untitled4/functions/mediaquery.dart';
+import 'package:untitled4/model/user_model.dart';
+import 'package:untitled4/page/home.dart';
+
+import '../data/langaue.dart';
+
+class SignUp extends StatefulWidget {
+  const SignUp(
+      {super.key,
+      required this.user,
+      required this.pageController,
+      required this.language});
+  final User user;
+  final PageController pageController;
+  final String language;
   @override
-  State<Signup> createState() => _SignupState();
+  _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _SignupState extends State<Signup> {
-  final GlobalKey<FormState> _formKey = GlobalKey();
-  final FocusNode _focusNodeEmail = FocusNode();
-  final FocusNode _focusNodePassword = FocusNode();
-  final FocusNode _focusNodeConfirmPassword = FocusNode();
-  final TextEditingController _controllerUsername = TextEditingController();
-  final TextEditingController _controllerEmail = TextEditingController();
-  final TextEditingController _controllerPassword = TextEditingController();
-  final TextEditingController _controllerConFirmPassword =
-      TextEditingController();
+class _SignUpPageState extends State<SignUp> {
+  final _formKey = GlobalKey<FormState>();
 
-  bool _obscurePassword = true;
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController secondNameController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  String userNameLabel = 'UserName';
+  String firstNameLabel = 'firstName';
+  String secondNameLabel = 'secondName';
+  String addressLabel = 'address';
+  String passwordLabel = 'password';
+  bool _showPassword = false;
+  void Function(String?)? onSaved;
+  String? Function(String?)? validator;
+  // (value) {
+  //                           if (value == null || value.isEmpty) {
+  //                             return 'Please enter your email';
+  //                           }
+  //                           return null;
+  //                         }
+
+  // (value) {
+  //   _password = value!;
+  // },
+  void _togglePasswordVisibility() {
+    setState(() {
+      _showPassword = !_showPassword;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 100),
-              Text(
-                "Register",
-                style: Theme.of(context).textTheme.headlineLarge,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "Create your account",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 35),
-              TextFormField(
-                controller: _controllerUsername,
-                keyboardType: TextInputType.name,
-                decoration: InputDecoration(
-                  labelText: "Username",
-                  prefixIcon: const Icon(Icons.person_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter username.";
-                  } else if (true) {
-                    return "Username is already registered.";
-                  }
-
-                  return null;
-                },
-                onEditingComplete: () => _focusNodeEmail.requestFocus(),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _controllerEmail,
-                focusNode: _focusNodeEmail,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter email.";
-                  } else if (!(value.contains('@') && value.contains('.'))) {
-                    return "Invalid email";
-                  }
-                  return null;
-                },
-                onEditingComplete: () => _focusNodePassword.requestFocus(),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _controllerPassword,
-                obscureText: _obscurePassword,
-                focusNode: _focusNodePassword,
-                keyboardType: TextInputType.visiblePassword,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  prefixIcon: const Icon(Icons.password_outlined),
-                  suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                      icon: _obscurePassword
-                          ? const Icon(Icons.visibility_outlined)
-                          : const Icon(Icons.visibility_off_outlined)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter password.";
-                  } else if (value.length < 8) {
-                    return "Password must be at least 8 character.";
-                  }
-                  return null;
-                },
-                onEditingComplete: () =>
-                    _focusNodeConfirmPassword.requestFocus(),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _controllerConFirmPassword,
-                obscureText: _obscurePassword,
-                focusNode: _focusNodeConfirmPassword,
-                keyboardType: TextInputType.visiblePassword,
-                decoration: InputDecoration(
-                  labelText: "Confirm Password",
-                  prefixIcon: const Icon(Icons.password_outlined),
-                  suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                      icon: _obscurePassword
-                          ? const Icon(Icons.visibility_outlined)
-                          : const Icon(Icons.visibility_off_outlined)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter password.";
-                  } else if (value != _controllerPassword.text) {
-                    return "Password doesn't match.";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 50),
-              Column(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            width: 200,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            content: const Text("Registered Successfully"),
-                          ),
-                        );
-
-                        _formKey.currentState?.reset();
-
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text("Register"),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Already have an account?"),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Login"),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+      appBar: AppBar(
+        title: Text(getLanguage(context, 'pageSignUp')),
+        centerTitle: true,
+        actions: [
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomePage(
+                            user: widget.user,
+                            controller: widget.pageController,
+                            language: widget.language,
+                          )),
+                );
+              },
+              child: Text(getLanguage(context, 'backToHome')))
+        ],
+      ),
+      body: Stack(
+        children: [
+          ClipPath(
+            clipper: WaveClipper(),
+            child: Container(
+              padding: const EdgeInsets.only(bottom: 450),
+              color: Colors.blue.withOpacity(.8),
+              height: 220,
+              alignment: Alignment.center,
+            ),
           ),
-        ),
+          ClipPath(
+            clipper: WaveClipper(waveDeep: 0, waveDeep2: 100),
+            child: Container(
+              padding: const EdgeInsets.only(bottom: 50),
+              color: Colors.blue.withOpacity(.3),
+              height: 180,
+              alignment: Alignment.center,
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Container(
+                  width: getSizePage(context, 1, 50),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        CustomSignUpTextFaild(
+                            controller: userNameController,
+                            nameLabel: getLanguage(context, 'userName'),
+                            validator: validator,
+                            onSaved: onSaved),
+                        SizedBox(height: 20),
+                        CustomSignUpTextFaild(
+                            controller: firstNameController,
+                            nameLabel: getLanguage(context, 'firstName'),
+                            validator: validator,
+                            onSaved: onSaved),
+                        SizedBox(height: 20),
+                        CustomSignUpTextFaild(
+                            controller: secondNameController,
+                            nameLabel: getLanguage(context, 'secondName'),
+                            validator: validator,
+                            onSaved: onSaved),
+                        SizedBox(height: 20),
+                        CustomSignUpTextFaild(
+                            controller: addressController,
+                            nameLabel: getLanguage(context, 'address'),
+                            validator: validator,
+                            onSaved: onSaved),
+                        SizedBox(height: 20),
+                        SizedBox(height: 20),
+                        TextFormField(
+                            controller: passwordController,
+                            decoration: InputDecoration(
+                              suffixIcon: GestureDetector(
+                                onTap: _togglePasswordVisibility,
+                                child: Icon(
+                                  !_showPassword
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                              ),
+                              fillColor: Colors.white38,
+                              filled: true,
+                              labelText: getLanguage(context, 'password'),
+                              border: OutlineInputBorder(),
+                            ),
+                            obscureText: _showPassword,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return getLanguage(context, 'password');
+                              }
+                              return null;
+                            },
+                            onSaved: onSaved),
+                        SizedBox(height: 20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    _formKey.currentState!.save();
+                                    final ProviderLogin providerLogin =
+                                        Provider.of<ProviderLogin>(context,
+                                            listen: false);
+                                    if (firstNameController.text.toString() !=
+                                            "" &&
+                                        secondNameController.text.toString() !=
+                                            "" &&
+                                        userNameController.text.toString() !=
+                                            "" &&
+                                        addressController.text.toString() !=
+                                            "" &&
+                                        passwordController.text.toString() !=
+                                            "") {
+                                      User user = User();
+                                      user.firstName =
+                                          firstNameController.text.toString();
+                                      user.secondName =
+                                          secondNameController.text.toString();
+                                      user.userName =
+                                          userNameController.text.toString();
+                                      user.name = user.firstName! +
+                                          " " +
+                                          user.secondName!;
+                                      user.address =
+                                          addressController.text.toString();
+                                      user.password =
+                                          passwordController.text.toString();
+
+                                      var resulte =
+                                          await providerLogin.createUser(
+                                              StaticData.urlAddUser, user);
+                                      user.id = "${resulte!["userId"]}";
+                                      if (user.id != null) {
+                                        firstNameController.clear();
+                                        secondNameController.clear();
+                                        userNameController.clear();
+                                        addressController.clear();
+                                        passwordController.clear();
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => HomePage(
+                                                    user: user,
+                                                    controller:
+                                                        widget.pageController,
+                                                    language: widget.language,
+                                                  )),
+                                        );
+                                      }
+                                    } else {
+                                      SnackBar snackBar = SnackBar(
+                                        content: Center(
+                                            child: Text(//messageFaildsEmpty
+                                                getLanguage(
+                                                    context, 'password'))),
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                      //print("asdas");
+                                    }
+                                  } else {
+                                    SnackBar snackBar = SnackBar(
+                                      content: Center(
+                                          child: Text(getLanguage(
+                                              context, 'password'))),
+                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                  }
+                                },
+                                child: Text(
+                                    getLanguage(context, 'saveAndLoginByUser')),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    _formKey.currentState!.save();
+                                    final ProviderLogin providerLogin =
+                                        Provider.of<ProviderLogin>(context,
+                                            listen: false);
+                                    if (firstNameController.text.toString() !=
+                                            "" &&
+                                        secondNameController.text.toString() !=
+                                            "" &&
+                                        userNameController.text.toString() !=
+                                            "" &&
+                                        addressController.text.toString() !=
+                                            "" &&
+                                        passwordController.text.toString() !=
+                                            "") {
+                                      User user = User();
+                                      user.firstName =
+                                          firstNameController.text.toString();
+                                      user.secondName =
+                                          secondNameController.text.toString();
+                                      user.userName =
+                                          userNameController.text.toString();
+                                      user.name = user.firstName! +
+                                          " " +
+                                          user.secondName!;
+                                      user.address =
+                                          addressController.text.toString();
+                                      user.password =
+                                          passwordController.text.toString();
+
+                                      var resulte =
+                                          await providerLogin.createUser(
+                                              StaticData.urlAddUser, user);
+                                      user.id = "${resulte!["userId"]}";
+                                      if (user.id != null) {
+                                        firstNameController.clear();
+                                        secondNameController.clear();
+                                        userNameController.clear();
+                                        addressController.clear();
+                                        passwordController.clear();
+
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => HomePage(
+                                                    user: widget.user,
+                                                    controller:
+                                                        widget.pageController,
+                                                    language: widget.language,
+                                                  )),
+                                        );
+                                      }
+                                    } else {
+                                      SnackBar snackBar = SnackBar(
+                                        content: Center(
+                                            child: Text(getLanguage(context,
+                                                'messageFaildsEmpty'))),
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                      //print("asdas");
+                                    }
+                                  } else {
+                                    SnackBar snackBar = SnackBar(
+                                      content: Center(
+                                          child: Text(getLanguage(
+                                              context, 'messageFaildsEmpty'))),
+                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                  }
+                                },
+                                child: Text(getLanguage(
+                                    context, 'saveAndLoginByAdmin')),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+class WaveClipper extends CustomClipper<Path> {
+  final double waveDeep;
+  final double waveDeep2;
+
+  WaveClipper({this.waveDeep = 100, this.waveDeep2 = 0});
+  @override
+  Path getClip(Size size) {
+    final double sw = size.width;
+    final double sh = size.height;
+
+    final Offset controlPoint1 = Offset(sw * .25, sh - waveDeep2 * 2);
+    final Offset destinationPoint1 = Offset(sw * .5, sh - waveDeep - waveDeep2);
+
+    final Offset controlPoint2 = Offset(sw * .75, sh - waveDeep * 2);
+    final Offset destinationPoint2 = Offset(sw, sh - waveDeep);
+
+    final Path path = Path()
+      ..lineTo(0, size.height - waveDeep2)
+      ..quadraticBezierTo(controlPoint1.dx, controlPoint1.dy,
+          destinationPoint1.dx, destinationPoint1.dy)
+      ..quadraticBezierTo(controlPoint2.dx, controlPoint2.dy,
+          destinationPoint2.dx, destinationPoint2.dy)
+      ..lineTo(size.width, 0)
+      ..lineTo(0, 0)
+      ..close();
+    return path;
+  }
 
   @override
-  void dispose() {
-    _focusNodeEmail.dispose();
-    _focusNodePassword.dispose();
-    _focusNodeConfirmPassword.dispose();
-    _controllerUsername.dispose();
-    _controllerEmail.dispose();
-    _controllerPassword.dispose();
-    _controllerConFirmPassword.dispose();
-    super.dispose();
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false; //if new instance have different instance than old instance
+    //then you must return true;
   }
 }

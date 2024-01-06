@@ -13,6 +13,10 @@ class StaticData {
   static const String urlGetAllProviderDetailsByProviderId =
       '${urlConnectionConst}providerDetails/provider'; //driver/all
   static const String urlGetAllDriver = '${urlConnectionConst}driver/all';
+
+  static const String urlGetTransportationFeeReport =
+      '${urlConnectionConst}joins/rangTransportationfee';
+  static const String urlAddUser = '${urlConnectionConst}user/add';
 //http://localhost:5000/api/transportationFee/add
 ////////////////////////// textDirection /////////////////////
 ////////////////////   Images path  //////////////////////////////////

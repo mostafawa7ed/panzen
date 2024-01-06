@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled4/api/CRUD.dart';
@@ -167,7 +169,12 @@ class ProviderTransportationFee extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeMessage(Text m) {
+  void changeMessage(Text m) async {
+    print("befor");
+    await Timer(Duration(seconds: 8), () {
+      message = Text("");
+    });
+    print("after");
     message = m;
     notifyListeners();
   }
