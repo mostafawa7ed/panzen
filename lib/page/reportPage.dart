@@ -241,7 +241,7 @@ Future<File> generatePDF(List<TransportaionfeeReport> data, DateTime fromDate,
   OpenFile.open('${output.path}/transportationfee.pdf');
   return file;
 }
-
+///
 
 // File pdfFile =
 //                     await generatePDF(providerTransportationFee.vehicleList);
