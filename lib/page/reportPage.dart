@@ -141,12 +141,12 @@ Future<File> generatePDF(List<TransportaionfeeReport> data, DateTime fromDate,
             'رقم العربية',
             'السائق',
             'شركة',
-            'س',
+            '  س  ',
           ] // Arabic column headers
         ]
       : [
           [
-            'S',
+            '  S  ',
             'provider',
             'Driver',
             'Car Number',

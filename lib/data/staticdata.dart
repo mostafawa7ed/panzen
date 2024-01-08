@@ -17,6 +17,8 @@ class StaticData {
   static const String urlGetTransportationFeeReport =
       '${urlConnectionConst}joins/rangTransportationfee';
   static const String urlAddUser = '${urlConnectionConst}user/add';
+  static const String urlTransportationDataTables =
+      "${urlConnectionConst}joins/transportationfee/all";
 //http://localhost:5000/api/transportationFee/add
 ////////////////////////// textDirection /////////////////////
 ////////////////////   Images path  //////////////////////////////////

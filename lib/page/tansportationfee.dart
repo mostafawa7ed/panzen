@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:date_field/date_field.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled4/model/driver_model.dart';
@@ -18,18 +19,21 @@ import 'package:untitled4/data/staticdata.dart';
 import 'package:untitled4/functions/mediaquery.dart';
 import 'package:open_file/open_file.dart';
 
+import '../controller/provider_report.dart';
 import '../data/langaue.dart';
+import 'transportationFeeDataTable.dart';
 
 class TransportationFee extends StatefulWidget {
-  const TransportationFee({super.key, required this.user});
+  const TransportationFee(
+      {super.key, required this.user, required this.language});
   final User user;
+  final String language;
   @override
   State<TransportationFee> createState() => _TransportationFeeState();
 }
 
 class _TransportationFeeState extends State<TransportationFee> {
   TextEditingController numberOfTon = TextEditingController();
-  TextEditingController requestDate = TextEditingController();
   TextEditingController totalValue = TextEditingController();
   TextEditingController _vehicleController = TextEditingController();
   TextEditingController _providerController = TextEditingController();
@@ -47,6 +51,7 @@ class _TransportationFeeState extends State<TransportationFee> {
   FocusNode _driverFieldFocus = FocusNode();
   FocusNode _numberTonFieldFocus = FocusNode();
 
+  DateTime? requestDate;
   String selected = '';
 
   Future<void> prepareData(BuildContext context) async {
@@ -90,10 +95,32 @@ class _TransportationFeeState extends State<TransportationFee> {
 
   @override
   Widget build(BuildContext context) {
+    var padd = getSizePage(context, 1, 60);
     return SingleChildScrollView(
       physics: AlwaysScrollableScrollPhysics(),
       child: Column(
         children: [
+          Padding(
+            padding: EdgeInsets.only(left: padd),
+            child: ElevatedButton(
+              child: Text("transportationFee"),
+              onPressed: () async {
+                final ProviderReportData providerReportData =
+                    Provider.of<ProviderReportData>(context, listen: false);
+                await providerReportData.transportaionfeeList(
+                    StaticData.urlTransportationDataTables);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TransportationFeeDataTable(
+                          user: widget.user,
+                          language: widget.language,
+                          transportationList:
+                              providerReportData.transportaionfeeallList)),
+                );
+              },
+            ),
+          ),
           Consumer<ProviderTransportationFee>(
               builder: (context, providerTransportationData, child) {
             return Container(
@@ -486,35 +513,22 @@ class _TransportationFeeState extends State<TransportationFee> {
           ),
           Container(
             width: getSizePage(context, 1, 63),
-            child: TextField(
-                controller: requestDate, //editing controller of this TextField
-                decoration: InputDecoration(
-                  icon: Icon(Icons.calendar_today), //icon of text field
-                  labelText: getLanguage(context, 'dateRequest'),
-                ),
-                readOnly: true, // when true user cannot edit text
-                onTap: () async {
-                  DateTime? pickedDate = await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AdoptiveCalendar(
-                        maxYear: 2222,
-                        minYear: 1111,
-                        initialDate: DateTime.now(),
-                        use24hFormat: true,
-                      );
-                    },
-                  );
-
-                  if (pickedDate != null) {
-                    String formattedDate = DateFormat('dd-MM-yyyy-hh-mm-ss').format(
-                        pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                    requestDate.text =
-                        formattedDate; //set foratted date to TextField value.
-                  } else {
-                    print("Date is not selected");
-                  }
-                }),
+            child: DateTimeFormField(
+              style: const TextStyle(
+                color: Colors.black,
+                decorationStyle: TextDecorationStyle.solid,
+              ),
+              decoration: InputDecoration(
+                labelText: getLanguage(context, 'dateTo'),
+              ),
+              firstDate: DateTime.now().add(const Duration(days: -222222)),
+              lastDate: DateTime.now().add(const Duration(days: 222222)),
+              initialPickerDateTime: DateTime.now(),
+              onChanged: (DateTime? value) {
+                requestDate = value;
+                //selectedDate = value;
+              },
+            ),
           ),
           Container(
             width: getSizePage(context, 1, 63),
@@ -531,7 +545,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                 if (selectedVehicle.iD == null &&
                     numberOfTon.text == "" &&
                     selectedProviderDetails.iD == null &&
-                    requestDate.text == "" &&
+                    requestDate == null &&
                     totalValue.text == "" &&
                     selectedDriver.iDD == null) {
                   providerTransportationFee.changeMessage(Text(
@@ -551,8 +565,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                       numberOfTon.text.toString();
                   transportationFeeModel.providersDetailsId =
                       selectedProviderDetails.iD.toString();
-                  transportationFeeModel.requestDate =
-                      requestDate.text.toString();
+                  transportationFeeModel.requestDate = requestDate.toString();
                   transportationFeeModel.totalValue =
                       totalValue.text.toString();
                   transportationFeeModel.driversId =
@@ -560,7 +573,8 @@ class _TransportationFeeState extends State<TransportationFee> {
 
                   await providerTransportationFee.addTransporationFee(
                       StaticData.urltransportationFeeAdd,
-                      transportationFeeModel);
+                      transportationFeeModel,
+                      requestDate);
                   providerTransportationFee.changeMessage(Text(
                     getLanguage(context, 'messageSuccess'),
                     style: TextStyle(
@@ -570,7 +584,6 @@ class _TransportationFeeState extends State<TransportationFee> {
                   ));
 
                   numberOfTon.clear();
-                  requestDate.clear();
                   totalValue.clear();
                   _vehicleController.clear();
                   _providerController.clear();

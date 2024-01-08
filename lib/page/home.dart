@@ -86,11 +86,14 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Text(
-            style: const TextStyle(fontSize: 20.0),
-            widget.user.name ?? "",
-          ),
           actions: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                style: const TextStyle(fontSize: 20.0),
+                widget.user.name ?? "",
+              ),
+            ),
             Visibility(
               visible: widget.user.userName == 'admin',
               child: ElevatedButton(
@@ -296,6 +299,7 @@ class _MyHomePageState extends State<HomePage> {
                 CustomPageView(
                   user: widget.user,
                   controller: widget.controller,
+                  language: widget.language,
                 ),
               ],
             ),
@@ -306,9 +310,13 @@ class _MyHomePageState extends State<HomePage> {
 
 class CustomPageView extends StatelessWidget {
   const CustomPageView(
-      {super.key, required this.controller, required this.user});
+      {super.key,
+      required this.controller,
+      required this.user,
+      required this.language});
   final User user;
   final PageController controller;
+  final String language;
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +336,7 @@ class CustomPageView extends StatelessWidget {
           const Center(
             child: Text('thid Page'),
           ),
-          TransportationFee(user: user),
+          TransportationFee(user: user, language: language),
           const ReportTap(),
         ],
       ),

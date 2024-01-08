@@ -17,28 +17,8 @@ class ProviderTransportationFee extends ChangeNotifier {
   List<DriverModel> driverList = [];
   Text message = Text("");
   double totalvalue = 0.0;
-  Future addTransporationFee(
-      String url, TransportationFeeModel transportationFee) async {
-    // int? parsedInt = int.tryParse(numberAsString);
-    //         double? parsedDouble = double.tryParse(numberAsString);
-    String originalDateString = transportationFee.requestDate!;
-    List<String> dateParts = originalDateString.split('-');
-
-    // Assuming the format is DD-MM-YYYY-HH-mm-ss
-    int day = int.parse(dateParts[0]);
-    int month = int.parse(dateParts[1]);
-    int year = int.parse(dateParts[2]);
-    int hour = int.parse(dateParts[3]);
-    int minute = int.parse(dateParts[4]);
-    int second = int.parse(dateParts[5]);
-
-    DateTime dateTime = DateTime(year, month, day, hour, minute, second);
-
-    // Format DateTime to ISO 8601 string
-    String iso8601String = DateFormat('yyyy-MM-ddTHH:mm:ss').format(dateTime);
-
-    // Now 'iso8601String' contains the date in ISO 8601 format
-    print(iso8601String);
+  Future addTransporationFee(String url,
+      TransportationFeeModel transportationFee, DateTime? requestDate) async {
     Map<String, dynamic> mymap = {
       "providersDetailsId":
           int.tryParse(transportationFee.providersDetailsId!) ?? 1,
@@ -46,7 +26,7 @@ class ProviderTransportationFee extends ChangeNotifier {
       "carsId": int.tryParse(transportationFee.carsId!) ?? 1,
       "totalValue": double.tryParse(transportationFee.totalValue!) ?? 1,
       "numberOfTon": double.tryParse(transportationFee.numberOfTon!) ?? 1,
-      "requestDate": iso8601String,
+      "requestDate": requestDate.toString(),
       "changerId": int.tryParse(transportationFee.changerId!) ?? 1
     };
     try {
