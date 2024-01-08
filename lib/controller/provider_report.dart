@@ -6,6 +6,9 @@ import 'package:untitled4/model/transportationfeeReportMode.dart';
 class ProviderReportData extends ChangeNotifier {
   List<TransportaionfeeReport> transportaionfeeReportList = [];
   List<TransportaionfeeReport> transportaionfeeallList = [];
+  int totalPages = 0;
+  int currentPage = 0;
+  int totalCount = 0;
   final Crud _crud = Crud();
 
   Future<void> transportaionfeeReportPrepareList(
@@ -38,11 +41,9 @@ class ProviderReportData extends ChangeNotifier {
     }
   }
 
-  Future<void> transportaionfeeList(String url) async {
+  Future<void> transportaionfeeList(String url, Map<String, String> map) async {
     try {
-      Map<String, dynamic> mymap = {"from": "", "to": ""};
-      // Make an HTTP GET request to the provided URL
-      Map<String, dynamic> dataResponse = await _crud.postRequest(url, mymap);
+      Map<String, dynamic> dataResponse = await _crud.postRequest(url, map);
 
       if (dataResponse['transportaionfeeReport'] != null) {
         List<dynamic> transportaionfeeReportListjson =
@@ -50,6 +51,9 @@ class ProviderReportData extends ChangeNotifier {
         transportaionfeeallList = transportaionfeeReportListjson
             .map((json) => TransportaionfeeReport.fromJson(json))
             .toList();
+        totalPages = dataResponse['totalPages'];
+        currentPage = dataResponse['currentPage'];
+        totalCount = dataResponse['totalCount'];
         notifyListeners();
         print(transportaionfeeReportList.toString());
         //List<dynamic> vehicles = dataResponse['vehicles'];

@@ -105,18 +105,13 @@ class _TransportationFeeState extends State<TransportationFee> {
             child: ElevatedButton(
               child: Text("transportationFee"),
               onPressed: () async {
-                final ProviderReportData providerReportData =
-                    Provider.of<ProviderReportData>(context, listen: false);
-                await providerReportData.transportaionfeeList(
-                    StaticData.urlTransportationDataTables);
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                       builder: (context) => TransportationFeeDataTable(
-                          user: widget.user,
-                          language: widget.language,
-                          transportationList:
-                              providerReportData.transportaionfeeallList)),
+                            user: widget.user,
+                            language: widget.language,
+                          )),
                 );
               },
             ),

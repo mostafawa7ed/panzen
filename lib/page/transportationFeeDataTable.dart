@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../controller/provider_report.dart';
+import '../data/staticdata.dart';
 import '../model/transportationfeeReportMode.dart';
 import '../model/user_model.dart';
 
@@ -9,12 +12,10 @@ class TransportationFeeDataTable extends StatefulWidget {
     Key? key,
     required this.language,
     required this.user,
-    required this.transportationList,
   }) : super(key: key);
 
   final String language;
   final User user;
-  final List<TransportaionfeeReport> transportationList;
 
   @override
   _TransportationFeeDataTableState createState() =>
@@ -26,59 +27,79 @@ class _TransportationFeeDataTableState
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   int _sortColumnIndex = 0;
   bool _sortAscending = false;
+  List<TransportaionfeeReport> transportationList = [];
+  Future<void> preparePaginationInit() async {
+    final ProviderReportData providerReportData =
+        Provider.of<ProviderReportData>(context, listen: false);
+    await providerReportData
+        .transportaionfeeList(StaticData.urlTransportationDatapagination, {
+      'from': '1',
+      'to': '10',
+    });
+  }
+
+  @override
+  void initState() {
+    preparePaginationInit();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: PaginatedDataTable(
-            arrowHeadColor: Colors.grey,
-            header: Text('Transportation Data Table'),
-            rowsPerPage: _rowsPerPage,
-            availableRowsPerPage: [5, 10],
-            onRowsPerPageChanged: (int? value) {
-              setState(() {
-                _rowsPerPage = value ?? PaginatedDataTable.defaultRowsPerPage;
-              });
-            },
-            sortColumnIndex: _sortColumnIndex,
-            sortAscending: false,
-            columnSpacing: 20,
-            showCheckboxColumn: true,
-            columns: [
-              DataColumn(
-                label: Text('ID'),
-                onSort: (columnIndex, ascending) {
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Consumer<ProviderReportData>(
+                builder: (context, providerReportData, child) {
+              return PaginatedDataTable(
+                arrowHeadColor: Colors.grey,
+                header: Text('Transportation Data Table'),
+                rowsPerPage: _rowsPerPage,
+                availableRowsPerPage: [5, 10],
+                onRowsPerPageChanged: (int? value) {
                   setState(() {
-                    _sortColumnIndex = columnIndex;
-                    _sortAscending = ascending;
-                    // Implement your sorting logic here
+                    _rowsPerPage =
+                        value ?? PaginatedDataTable.defaultRowsPerPage;
                   });
                 },
-              ),
-              DataColumn(
-                  label: Text(
-                'Driver Name',
-                style: TextStyle(fontSize: 10),
-              )),
-              DataColumn(label: Text('Provider Name')),
-              DataColumn(label: Text('Total Value')),
-              DataColumn(label: Text('Driver Name')),
-              DataColumn(label: Text('Provider Name')),
-              DataColumn(label: Text('Total Value')),
-              DataColumn(label: Text('Driver Name')),
-              DataColumn(label: Text('Provider Name')),
+                sortColumnIndex: _sortColumnIndex,
+                sortAscending: false,
+                columnSpacing: 20,
+                showCheckboxColumn: true,
+                columns: [
+                  DataColumn(
+                    label: Text('ID'),
+                    onSort: (columnIndex, ascending) {
+                      setState(() {
+                        _sortColumnIndex = columnIndex;
+                        _sortAscending = ascending;
+                        // Implement your sorting logic here
+                      });
+                    },
+                  ),
+                  DataColumn(
+                      label: Text(
+                    'Driver Name',
+                    style: TextStyle(fontSize: 10),
+                  )),
+                  DataColumn(label: Text('Provider Name')),
+                  DataColumn(label: Text('Total Value')),
+                  DataColumn(label: Text('Driver Name')),
+                  DataColumn(label: Text('Provider Name')),
+                  DataColumn(label: Text('Total Value')),
+                  DataColumn(label: Text('Driver Name')),
+                  DataColumn(label: Text('Provider Name')),
 
-              // Add more DataColumn widgets as needed
-            ],
-            source: _TransportationDataSource(
-              transportationList: widget.transportationList,
-              context: context,
-            ),
-          ),
-        ),
+                  // Add more DataColumn widgets as needed
+                ],
+                source: _TransportationDataSource(
+                  transportationList:
+                      providerReportData.transportaionfeeallList,
+                  context: context,
+                ),
+              );
+            })),
       ),
     );
   }
