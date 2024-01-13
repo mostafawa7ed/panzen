@@ -8,9 +8,12 @@ import 'package:untitled4/page/login.dart';
 import 'package:untitled4/page/signup.dart';
 
 import 'package:untitled4/page/tansportationfee.dart';
+import 'package:untitled4/page/transportationFeeDataTable.dart';
 
 import '../data/langaue.dart';
+import 'driver.dart';
 import 'reportPage.dart';
+import 'vehicle.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({
@@ -294,6 +297,34 @@ class _MyHomePageState extends State<HomePage> {
                             child: Text(getLanguage(context, 'report'))),
                       ),
                     ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            style: indexPage == 5
+                                ? ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange[300],
+                                    elevation: 5,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )
+                                : null,
+                            onPressed: () {
+                              setState(() {
+                                indexPage = 5;
+                              });
+                              widget.controller.animateToPage(
+                                5,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              );
+                            },
+                            child: Text(getLanguage(context, 'report'))),
+                      ),
+                    ),
                   ],
                 ),
                 CustomPageView(
@@ -327,17 +358,17 @@ class CustomPageView extends StatelessWidget {
         /// Use [Axis.vertical] to scroll vertically.
         controller: controller,
         children: <Widget>[
-          const Center(
-            child: Text('first Page'),
+          DriverTab(
+            language: language,
+            user: user,
           ),
-          const Center(
-            child: Text('Second Page'),
-          ),
+          VehicleTab(user: user, language: language),
           const Center(
             child: Text('thid Page'),
           ),
           TransportationFee(user: user, language: language),
           const ReportTap(),
+          TransportationFeeDataTable(user: user, language: language),
         ],
       ),
     );

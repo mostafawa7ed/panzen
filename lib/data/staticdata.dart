@@ -20,6 +20,14 @@ class StaticData {
   static const String urlTransportationDataTables =
       "${urlConnectionConst}joins/transportationfee/all";
 
+  static const String urlAddVehicle = "${urlConnectionConst}vehicles/add";
+  static const String urlVehicleSearch = "${urlConnectionConst}vehicles/search";
+  static const String urlVehicleEdit = "${urlConnectionConst}vehicles/update";
+
+  static const String urlAddDriver = "${urlConnectionConst}driver/add";
+  static const String urlDriverSearch = "${urlConnectionConst}driver/search";
+  static const String urlDriverEdit = "${urlConnectionConst}driver/update";
+
   ///transportationfee/pagination
   static const String urlTransportationDatapagination =
       "${urlConnectionConst}joins/transportationfee/pagination";

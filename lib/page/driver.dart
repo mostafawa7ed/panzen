@@ -1,36 +1,31 @@
-import 'dart:io';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled4/model/user_model.dart';
 import 'package:untitled4/model/vehicle_model.dart';
 import 'package:flutter/material.dart';
 
-import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
+import '../controller/provider_driver.dart';
 
-import 'package:open_file/open_file.dart';
-
-import '../controller/provider_vehicle.dart';
 import '../data/langaue.dart';
 import '../data/staticdata.dart';
 import '../functions/mediaquery.dart';
+import '../model/driver_model.dart';
 
-class VehicleTab extends StatefulWidget {
-  const VehicleTab({super.key, required this.user, required this.language});
+class DriverTab extends StatefulWidget {
+  const DriverTab({super.key, required this.user, required this.language});
   final User user;
   final String language;
   @override
-  State<VehicleTab> createState() => _VehicleTabState();
+  State<DriverTab> createState() => _DriverTabState();
 }
 
-class _VehicleTabState extends State<VehicleTab> {
+class _DriverTabState extends State<DriverTab> {
   Vehicle selectedVehicle = Vehicle();
   String selected = '';
-  VehicleMap? selectedColumn;
-  List<VehicleMap> vehicleColumnsItems = [
-    VehicleMap("Name", "الأسم", "NAME"),
-    VehicleMap("Plate Num", "رقم العربة", "PLATE_NO"),
+  DriverMap? selectedColumn;
+  List<DriverMap> vehicleColumnsItems = [
+    DriverMap("Name", "الأسم", "NAME"),
+    DriverMap("Address", "العنوان", "ADDRESS"),
   ];
   @override
   void initState() {
@@ -39,21 +34,12 @@ class _VehicleTabState extends State<VehicleTab> {
 
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController _controllerName = TextEditingController();
-  TextEditingController _controllerPlateNo = TextEditingController();
+  TextEditingController _controllerFirstName = TextEditingController();
+  TextEditingController _controllerSecondName = TextEditingController();
+  TextEditingController _controllerAddress = TextEditingController();
   TextEditingController _controllerSearched = TextEditingController();
 
-  int? _selectedVehicleTypeId;
-  FocusNode _focusNodeName = FocusNode();
-  FocusNode _focusNodePlateNo = FocusNode();
-
-  int? vehicletype;
-  List<VehicleType> vehicleTypes = [
-    VehicleType(1, 'عربة'),
-    VehicleType(2, 'مقطورة'),
-    // Add more VehicleType objects as needed
-  ];
-  Vehicle? editedvehicle;
+  DriverModel? driverModelEdit;
   int addEdit = 1; //add = 1 edit =2
   @override
   Widget build(BuildContext context) {
@@ -64,17 +50,17 @@ class _VehicleTabState extends State<VehicleTab> {
               key: _formKey,
               child: Column(
                 children: [
-                  Consumer<ProviderVehicle>(
-                      builder: (context, providerVehicle, child) {
+                  Consumer<ProviderDriver>(
+                      builder: (context, providerDriver, child) {
                     return IconButton(
                         onPressed: () {
                           addEdit = 2;
                         },
                         icon: Icon(Icons.edit));
                   }),
-                  Consumer<ProviderVehicle>(
-                      builder: (context, providerVehicle, child) {
-                    return providerVehicle.message;
+                  Consumer<ProviderDriver>(
+                      builder: (context, providerDriver, child) {
+                    return providerDriver.message;
                   }),
                   Container(
                     width: getSizePage(context, 1, 60),
@@ -82,10 +68,40 @@ class _VehicleTabState extends State<VehicleTab> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 19),
                       child: TextFormField(
-                        controller: _controllerName,
-                        focusNode: _focusNodeName,
+                        controller: _controllerFirstName,
                         decoration: InputDecoration(
-                          labelText: 'Name',
+                          labelText: 'FirstName',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xFF000000)),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          // Add your onChanged logic here
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a name';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          // Add your onSaved logic here
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: getSizePage(context, 1, 60),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 19),
+                      child: TextFormField(
+                        controller: _controllerSecondName,
+                        decoration: InputDecoration(
+                          labelText: 'ScondName',
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -114,10 +130,9 @@ class _VehicleTabState extends State<VehicleTab> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: TextFormField(
-                        controller: _controllerPlateNo,
-                        focusNode: _focusNodePlateNo,
+                        controller: _controllerAddress,
                         decoration: InputDecoration(
-                          labelText: 'Plate Number',
+                          labelText: 'Address',
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -140,61 +155,29 @@ class _VehicleTabState extends State<VehicleTab> {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    width: getSizePage(context, 1, 55),
-                    child: DropdownButtonFormField<int>(
-                      decoration: InputDecoration(
-                        labelText: 'Vehicle Type ID',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
-                        ),
-                      ),
-                      value: _selectedVehicleTypeId,
-                      items: vehicleTypes.map((VehicleType type) {
-                        return DropdownMenuItem<int>(
-                          value: type.id,
-                          child: Text(type.name),
-                        );
-                      }).toList(),
-                      onChanged: (int? value) {
-                        setState(() {
-                          _selectedVehicleTypeId = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please select a vehicle type';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        vehicletype = value;
-                      },
-                    ),
-                  ),
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        final ProviderVehicle providerVehicle =
-                            Provider.of<ProviderVehicle>(context,
-                                listen: false);
-                        Vehicle vehicle = Vehicle(
-                            vEHICLETYPEID: vehicletype,
-                            pLATENO: _controllerPlateNo.text,
-                            cHANGERID: int.tryParse(widget.user.id!),
-                            nAME: _controllerName.text);
-                        await providerVehicle.addVehicle(
-                            StaticData.urlAddVehicle, vehicle);
-                        _controllerName.clear();
-                        _controllerPlateNo.clear();
+                        final ProviderDriver providerDriver =
+                            Provider.of<ProviderDriver>(context, listen: false);
+                        DriverModel driver = DriverModel(
+                            aDDRESSD: _controllerAddress.text,
+                            fIRSTNAMED: _controllerFirstName.text,
+                            sECONDNAMED: _controllerSecondName.text,
+                            nAMED: _controllerFirstName.text +
+                                ' ' +
+                                _controllerSecondName.text,
+                            cHANGERIDD: int.tryParse(widget.user.id!));
+                        await providerDriver.addDriver(
+                            StaticData.urlAddDriver, driver);
+///////////////////////////////////////TODO/////////////////////
+                        _controllerAddress.clear();
+                        _controllerFirstName.clear();
+                        _controllerSecondName.clear();
                         Text message =
                             Text(getLanguage(context, 'messageSuccess'));
-                        providerVehicle.changeMessage(message);
+                        providerDriver.changeMessage(message);
                       }
                     },
                     child: Text('add'),
@@ -207,12 +190,12 @@ class _VehicleTabState extends State<VehicleTab> {
               key: _formKey,
               child: Column(
                 children: [
-                  Consumer<ProviderVehicle>(
-                      builder: (context, providerVehicle, child) {
-                    return providerVehicle.message;
+                  Consumer<ProviderDriver>(
+                      builder: (context, providerDriver, child) {
+                    return providerDriver.message;
                   }),
-                  Consumer<ProviderVehicle>(
-                      builder: (context, providerVehicle, child) {
+                  Consumer<ProviderDriver>(
+                      builder: (context, providerDriver, child) {
                     return Row(
                       children: [
                         Expanded(
@@ -240,14 +223,14 @@ class _VehicleTabState extends State<VehicleTab> {
                           child: DropdownButton(
                             value: selectedColumn,
                             items: vehicleColumnsItems
-                                .map<DropdownMenuItem<VehicleMap>>(
+                                .map<DropdownMenuItem<DriverMap>>(
                                   (e) => DropdownMenuItem(
                                     value: e,
                                     child: Text(e.nameEnglish!),
                                   ),
                                 )
                                 .toList(),
-                            onChanged: (VehicleMap? value) => setState(
+                            onChanged: (DriverMap? value) => setState(
                               () {
                                 if (value != null) selectedColumn = value;
                               },
@@ -269,13 +252,13 @@ class _VehicleTabState extends State<VehicleTab> {
                               controller: _controllerSearched,
                               onChanged: (value) async {
                                 if (selectedColumn != null) {
-                                  String url = StaticData.urlVehicleSearch +
+                                  String url = StaticData.urlDriverSearch +
                                       '?column=${selectedColumn!.column}&value=${_controllerSearched.text}';
-                                  final ProviderVehicle providerVehicle =
-                                      Provider.of<ProviderVehicle>(context,
+                                  final ProviderDriver providerDriver =
+                                      Provider.of<ProviderDriver>(context,
                                           listen: false);
-                                  await providerVehicle
-                                      .getSearchedVehicleData(url);
+                                  await providerDriver
+                                      .getSearchedDriverData(url);
                                 }
                               },
                             ),
@@ -285,18 +268,18 @@ class _VehicleTabState extends State<VehicleTab> {
                       ],
                     ),
                   ),
-                  Consumer<ProviderVehicle>(
-                      builder: (context, providerVehicle, child) {
+                  Consumer<ProviderDriver>(
+                      builder: (context, providerDriver, child) {
                     return Container(
                       padding: EdgeInsets.only(top: 20),
                       width: getSizePage(context, 1, 60),
                       height: getSizePage(context, 2, 30),
                       child: ListView.builder(
                         //shrinkWrap: true,
-                        itemCount: providerVehicle.searchedList.length,
+                        itemCount: providerDriver.searchedList.length,
                         itemBuilder: (context, index) {
-                          Vehicle currentObject =
-                              providerVehicle.searchedList[index];
+                          DriverModel currentObject =
+                              providerDriver.searchedList[index];
                           return Card(
                             child: Padding(
                                 padding: const EdgeInsets.all(4.0),
@@ -308,52 +291,30 @@ class _VehicleTabState extends State<VehicleTab> {
                                         child: Text((index + 1).toString())),
                                     Expanded(
                                         flex: 2,
-                                        child: Text(currentObject.nAME!)),
+                                        child: Text(currentObject.nAMED!)),
                                     Expanded(
                                         flex: 2,
                                         child:
-                                            Text('${currentObject.pLATENO}')),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                          '${currentObject.nUMBEROFTRANSACTIONS}'),
-                                    ),
+                                            Text('${currentObject.aDDRESSD}')),
                                     Expanded(
                                       child: ElevatedButton(
                                           onPressed: () {
-                                            editedvehicle = providerVehicle
+                                            driverModelEdit = providerDriver
                                                 .searchedList[index];
-                                            _controllerPlateNo.text =
-                                                currentObject.pLATENO
+                                            _controllerFirstName.text =
+                                                currentObject.fIRSTNAMED
                                                     .toString();
-                                            _controllerName.text =
-                                                currentObject.nAME!;
-                                            _selectedVehicleTypeId =
-                                                currentObject.vEHICLETYPEID;
+                                            _controllerSecondName.text =
+                                                currentObject.sECONDNAMED
+                                                    .toString();
+                                            _controllerAddress.text =
+                                                currentObject.aDDRESSD!;
                                           },
                                           child: Text("Select")),
                                     ),
                                   ],
                                 ))),
                           );
-                          // return ListTile(
-                          //   leading: Text((index + 1).toString()),
-                          //   title: Text(currentObject.nAME!),
-                          //   trailing: ElevatedButton(
-                          //       onPressed: () {
-                          //         editedvehicle =
-                          //             providerVehicle.searchedList[index];
-                          //         _controllerPlateNo.text =
-                          //             currentObject.pLATENO.toString();
-                          //         _controllerName.text = currentObject.nAME!;
-                          //         _selectedVehicleTypeId =
-                          //             currentObject.vEHICLETYPEID;
-                          //       },
-                          //       child: Text("Select")),
-                          //   subtitle: Text(
-                          //       '${currentObject.pLATENO} - ${currentObject.nUMBEROFTRANSACTIONS}'),
-                          //   onTap: () {},
-                          // );
                         },
                       ),
                     );
@@ -364,10 +325,9 @@ class _VehicleTabState extends State<VehicleTab> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 19),
                       child: TextFormField(
-                        controller: _controllerName,
-                        focusNode: _focusNodeName,
+                        controller: _controllerFirstName,
                         decoration: InputDecoration(
-                          labelText: 'Name',
+                          labelText: 'FirsrtName',
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -396,10 +356,9 @@ class _VehicleTabState extends State<VehicleTab> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: TextFormField(
-                        controller: _controllerPlateNo,
-                        focusNode: _focusNodePlateNo,
+                        controller: _controllerSecondName,
                         decoration: InputDecoration(
-                          labelText: 'Plate Number',
+                          labelText: 'Second Name',
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -423,61 +382,61 @@ class _VehicleTabState extends State<VehicleTab> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    width: getSizePage(context, 1, 55),
-                    child: DropdownButtonFormField<int>(
-                      decoration: InputDecoration(
-                        labelText: 'Vehicle Type ID',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
+                    width: getSizePage(context, 1, 60),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      child: TextFormField(
+                        controller: _controllerAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Address',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.green),
+                          ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
-                        ),
+                        onChanged: (value) {
+                          // Add your onChanged logic here
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a plate number';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          // Add your onSaved logic here
+                        },
                       ),
-                      value: _selectedVehicleTypeId,
-                      items: vehicleTypes.map((VehicleType type) {
-                        return DropdownMenuItem<int>(
-                          value: type.id,
-                          child: Text(type.name),
-                        );
-                      }).toList(),
-                      onChanged: (int? value) {
-                        setState(() {
-                          _selectedVehicleTypeId = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please select a vehicle type';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        vehicletype = value;
-                      },
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        final ProviderVehicle providerVehicle =
-                            Provider.of<ProviderVehicle>(context,
-                                listen: false);
-                        editedvehicle!.nAME = _controllerName.text;
-                        editedvehicle!.pLATENO = _controllerPlateNo.text;
-                        editedvehicle!.vEHICLETYPEID = vehicletype;
-                        editedvehicle!.cHANGERID =
+                        final ProviderDriver providerDriver =
+                            Provider.of<ProviderDriver>(context, listen: false);
+                        driverModelEdit!.nAMED = _controllerFirstName.text +
+                            ' ' +
+                            _controllerSecondName.text;
+                        driverModelEdit!.fIRSTNAMED = _controllerFirstName.text;
+                        driverModelEdit!.sECONDNAMED =
+                            _controllerSecondName.text;
+                        driverModelEdit!.aDDRESSD = _controllerAddress.text;
+                        driverModelEdit!.cHANGERIDD =
                             int.tryParse(widget.user.id!);
-                        if (editedvehicle != null) {
-                          await providerVehicle.editVehicle(
-                              StaticData.urlVehicleEdit, editedvehicle!);
-                          _controllerName.clear();
-                          _controllerPlateNo.clear();
+
+                        if (driverModelEdit != null) {
+                          await providerDriver.editDriver(
+                              StaticData.urlDriverEdit, driverModelEdit!);
+                          _controllerFirstName.clear();
+                          _controllerSecondName.clear();
+                          _controllerAddress.clear();
                           Text message =
                               Text(getLanguage(context, 'messageSuccess'));
-                          providerVehicle.changeMessage(message);
+                          providerDriver.changeMessage(message);
                         }
                       }
                     },
@@ -497,12 +456,12 @@ class VehicleType {
   VehicleType(this.id, this.name);
 }
 
-class VehicleMap {
+class DriverMap {
   String? nameArabic;
   String? nameEnglish;
   String? column;
 
-  VehicleMap(this.nameArabic, this.nameEnglish, this.column);
+  DriverMap(this.nameArabic, this.nameEnglish, this.column);
 }
 // File pdfFile =
 //                     await generatePDF(providerTransportationFee.vehicleList);

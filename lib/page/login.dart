@@ -20,6 +20,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _showChangePassword = false;
+  bool _showPassword = true;
   final _formKey = GlobalKey<FormState>();
   final PageController controller = PageController();
   late String _email;
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController newPassword = TextEditingController();
   TextEditingController rewriteNewPassword = TextEditingController();
   // Initial time in seconds
-  bool _showPassword = false;
+
   void _togglePasswordVisibility() {
     setState(() {
       _showPassword = !_showPassword;
@@ -117,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                             suffixIcon: GestureDetector(
                               onTap: _togglePasswordVisibility,
                               child: Icon(
-                                _showPassword
+                                !_showPassword
                                     ? Icons.visibility
                                     : Icons.visibility_off,
                               ),
@@ -191,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                                       suffixIcon: GestureDetector(
                                         onTap: _togglePasswordVisibility,
                                         child: Icon(
-                                          _showPassword
+                                          !_showPassword
                                               ? Icons.visibility
                                               : Icons.visibility_off,
                                         ),
@@ -209,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                                       suffixIcon: GestureDetector(
                                         onTap: _togglePasswordVisibility,
                                         child: Icon(
-                                          _showPassword
+                                          !_showPassword
                                               ? Icons.visibility
                                               : Icons.visibility_off,
                                         ),

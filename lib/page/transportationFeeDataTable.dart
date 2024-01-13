@@ -1,5 +1,5 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../controller/provider_report.dart';
@@ -24,18 +24,13 @@ class TransportationFeeDataTable extends StatefulWidget {
 
 class _TransportationFeeDataTableState
     extends State<TransportationFeeDataTable> {
-  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
-  int _sortColumnIndex = 0;
-  bool _sortAscending = false;
   List<TransportaionfeeReport> transportationList = [];
   Future<void> preparePaginationInit() async {
     final ProviderReportData providerReportData =
         Provider.of<ProviderReportData>(context, listen: false);
-    await providerReportData
-        .transportaionfeeList(StaticData.urlTransportationDatapagination, {
-      'from': '1',
-      'to': '10',
-    });
+    await providerReportData.transportaionfeeList(
+        StaticData.urlTransportationDatapagination,
+        {'from': 1, 'to': 10, 'limit': 10});
   }
 
   @override
@@ -44,106 +39,280 @@ class _TransportationFeeDataTableState
     super.initState();
   }
 
+  final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            child: Consumer<ProviderReportData>(
-                builder: (context, providerReportData, child) {
-              return PaginatedDataTable(
-                arrowHeadColor: Colors.grey,
-                header: Text('Transportation Data Table'),
-                rowsPerPage: _rowsPerPage,
-                availableRowsPerPage: [5, 10],
-                onRowsPerPageChanged: (int? value) {
-                  setState(() {
-                    _rowsPerPage =
-                        value ?? PaginatedDataTable.defaultRowsPerPage;
-                  });
-                },
-                sortColumnIndex: _sortColumnIndex,
-                sortAscending: false,
-                columnSpacing: 20,
-                showCheckboxColumn: true,
-                columns: [
-                  DataColumn(
-                    label: Text('ID'),
-                    onSort: (columnIndex, ascending) {
-                      setState(() {
-                        _sortColumnIndex = columnIndex;
-                        _sortAscending = ascending;
-                        // Implement your sorting logic here
-                      });
-                    },
-                  ),
-                  DataColumn(
-                      label: Text(
-                    'Driver Name',
-                    style: TextStyle(fontSize: 10),
-                  )),
-                  DataColumn(label: Text('Provider Name')),
-                  DataColumn(label: Text('Total Value')),
-                  DataColumn(label: Text('Driver Name')),
-                  DataColumn(label: Text('Provider Name')),
-                  DataColumn(label: Text('Total Value')),
-                  DataColumn(label: Text('Driver Name')),
-                  DataColumn(label: Text('Provider Name')),
+    return Scrollbar(
+      thickness: 20, // Thickness of the scrollbar
 
-                  // Add more DataColumn widgets as needed
-                ],
-                source: _TransportationDataSource(
-                  transportationList:
-                      providerReportData.transportaionfeeallList,
-                  context: context,
+      thumbVisibility: true,
+
+      controller: _scrollController,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Column(
+          children: [
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 0.8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(
+                      child: Text(""),
+                    ),
+                    Expanded(child: Text("")),
+                  ],
                 ),
+              ),
+            ),
+            Consumer<ProviderReportData>(
+                builder: (context, providerReportData, child) {
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: providerReportData.transportaionfeeallList.length,
+                itemBuilder: (context, index) {
+                  return CustomRowWidget(
+                    transportaionfeeReport:
+                        providerReportData.transportaionfeeallList[index],
+                    currentIndex: index + 1,
+                  );
+                },
               );
-            })),
+            }),
+            Consumer<ProviderReportData>(
+                builder: (context, providerReportData, child) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                      onPressed: providerReportData.currentPage !=
+                              providerReportData.totalPages
+                          ? () async {
+                              int start = 0;
+                              int end = 0;
+                              start = providerReportData.totalCount % 10;
+                              if (start == 0) {
+                                start = providerReportData.totalCount - 10 + 1;
+                              } else {
+                                start =
+                                    (providerReportData.totalPages - 1) * 10 +
+                                        providerReportData.totalCount % 10 +
+                                        1;
+                              }
+                              end = start + 9;
+
+                              await providerReportData.transportaionfeeList(
+                                  StaticData.urlTransportationDatapagination, {
+                                'from': start, //'$start',
+                                'to': end //'$end',
+                              });
+                              print(providerReportData.totalCount);
+                              // Add your onPressed logic here
+                            }
+                          : null,
+                      icon: const Icon(Icons.keyboard_double_arrow_right)),
+                  IconButton(
+                      onPressed: providerReportData.currentPage !=
+                              providerReportData.totalPages
+                          ? () async {
+                              int start =
+                                  providerReportData.currentPage * 10 + 1;
+                              int end = start + 9;
+
+                              await providerReportData.transportaionfeeList(
+                                  StaticData.urlTransportationDatapagination, {
+                                'from': start, //'$start',
+                                'to': end //'$end',
+                              });
+                              print(providerReportData.totalCount);
+                              // Add your onPressed logic here
+                            }
+                          : null,
+                      icon: const Icon(Icons.arrow_back)),
+                  TextButton(
+                      onPressed: () {},
+                      child: Text(providerReportData.currentPage.toString())),
+                  IconButton(
+                      onPressed: providerReportData.currentPage != 1
+                          ? () async {
+                              int start = 0;
+                              int end = 0;
+                              start = providerReportData.totalPages * 10 - 10;
+                              end = start + 9;
+                              await providerReportData.transportaionfeeList(
+                                  StaticData.urlTransportationDatapagination, {
+                                'from': start, //'$start',
+                                'to': end //'$end',
+                              });
+                              print(providerReportData.totalCount);
+                              // Add your onPressed logic here
+                            }
+                          : null,
+                      icon: const Icon(Icons.arrow_forward)),
+                  IconButton(
+                      onPressed: providerReportData.currentPage != 1
+                          ? () async {
+                              int start = 0;
+                              int end = 0;
+                              start = 1;
+                              end = start + 9;
+                              await providerReportData.transportaionfeeList(
+                                  StaticData.urlTransportationDatapagination, {
+                                'from': start, //'$start',
+                                'to': end //'$end',
+                              });
+                              print(providerReportData.totalCount);
+                              // Add your onPressed logic here
+                            }
+                          : null,
+                      icon: const Icon(Icons.keyboard_double_arrow_left)),
+                ],
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _TransportationDataSource extends DataTableSource {
-  final List<TransportaionfeeReport> transportationList;
-  final BuildContext context;
-
-  _TransportationDataSource({
-    required this.transportationList,
-    required this.context,
-  });
+// ignore: must_be_immutable
+class CustomRowWidget extends StatelessWidget {
+  final TransportaionfeeReport transportaionfeeReport;
+  final int currentIndex;
+  CustomRowWidget(
+      {required this.transportaionfeeReport, required this.currentIndex});
+  final TextStyle customTextStyle = const TextStyle(
+    color: Color.fromARGB(255, 0, 0, 0),
+    fontSize: 16.0,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.normal,
+    // You can add more styles as needed
+  );
+  DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
 
   @override
-  DataRow? getRow(int index) {
-    if (index >= transportationList.length) return null;
-    final row = transportationList[index];
-    return DataRow(
-      onSelectChanged: (value) {
-        print(value);
-      },
-      selected: true,
-      cells: [
-        DataCell(Text(row.transportationFeeId?.toString() ?? '')),
-        DataCell(Text(row.driverName ?? '')),
-        DataCell(Text(row.providerName ?? '')),
-        DataCell(Text(row.totalValue?.toString() ?? '')),
-        DataCell(Text(row.totalValue.toString())),
-        DataCell(Text(row.providerDetailsAmountPerTon.toString())),
-        DataCell(Text(row.requestDate.toString())),
-        DataCell(Text(row.providerDetailsStartDate.toString())),
-        DataCell(Text(row.providerDetailsEndDate.toString())),
-        // Add more cells based on your requirements
-      ],
+  Widget build(BuildContext context) {
+    String? endDate;
+    String? startDate = getDateCasting(
+        DateTime.parse(transportaionfeeReport.providerDetailsStartDate!));
+    if (transportaionfeeReport.providerDetailsEndDate != null) {
+      endDate = getDateCasting(
+          DateTime.parse(transportaionfeeReport.providerDetailsEndDate!));
+    } else {
+      endDate = "";
+    }
+    String? daterequest;
+    if (transportaionfeeReport.requestDate != null) {
+      daterequest =
+          getDateCasting(DateTime.parse(transportaionfeeReport.requestDate!));
+    } else {
+      daterequest = "";
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Container(
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Text(style: customTextStyle, currentIndex.toString()),
+              ),
+              Expanded(
+                flex: 1,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.transportationFeeId.toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.providerName.toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.driverName.toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.numberOfTon.toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(style: customTextStyle, startDate.toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(style: customTextStyle, endDate!),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(style: customTextStyle, daterequest!),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.totalValue.toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.providerDetailsAmountPerTon
+                        .toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  child: const Text("Action"),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
+}
 
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get rowCount => transportationList.length;
-
-  @override
-  int get selectedRowCount => 0;
+String? getDateCasting(DateTime? date) {
+  String formattedDateTime = '${date!.year}-${(date.month)}-${(date.day)} \n'
+      '${(date.hour)}:${(date.minute)}:${(date.second)}';
+  return formattedDateTime;
 }

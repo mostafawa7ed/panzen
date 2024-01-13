@@ -2,20 +2,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled4/api/CRUD.dart';
 import 'package:untitled4/model/driver_model.dart';
-import 'package:untitled4/model/vehicle_model.dart';
 
-class ProviderVehicle extends ChangeNotifier {
+class ProviderDriver extends ChangeNotifier {
   final Crud _crud = Crud();
-  List<Vehicle> vehicleList = [];
-  List<Vehicle> searchedList = [];
+  List<DriverModel> driverList = [];
+  List<DriverModel> searchedList = [];
   Text message = Text("");
   double totalvalue = 0.0;
-  Future addVehicle(String url, Vehicle vehicle) async {
+  Future addDriver(String url, DriverModel driver) async {
     Map<String, dynamic> mymap = {
-      "name": vehicle.nAME,
-      "plateNo": vehicle.pLATENO,
-      "vehicleTypeId": vehicle.vEHICLETYPEID,
-      "changerId": vehicle.cHANGERID,
+      "name": driver.nAMED,
+      "address": driver.aDDRESSD,
+      "firstName": driver.fIRSTNAMED,
+      "secondName": driver.sECONDNAMED,
+      "changerId": driver.cHANGERIDD,
     };
     try {
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, mymap);
@@ -33,41 +33,16 @@ class ProviderVehicle extends ChangeNotifier {
     }
   }
 
-  Future<List<DriverModel>> driverPrepareList(String url) async {
+  Future<void> getSearchedDriverData(String url) async {
     try {
       // Make an HTTP GET request to the provided URL
       Map<String, dynamic> dataResponse = await _crud.getRequest(url);
 
       if (dataResponse['drivers'] != null) {
-        List<dynamic> data = dataResponse['drivers'];
-//        driverList = data.map((json) => DriverModel.fromJson(json)).toList();
-        notifyListeners();
-        //      print(driverList.toString());
-        return [];
-        //List<dynamic> vehicles = dataResponse['vehicles'];
-      } else {
-        // Handle the case where the server returned an error
-        print('Request failed with status: ${dataResponse.toString()}');
-        return [];
-        // Return or handle accordingly
-      }
-    } catch (e) {
-      // Handle exceptions that might occur during the request
-      print('Error fetching data: $e');
-      // Return or handle accordingly
-      return [];
-    }
-  }
-
-  Future<void> getSearchedVehicleData(String url) async {
-    try {
-      // Make an HTTP GET request to the provided URL
-      Map<String, dynamic> dataResponse = await _crud.getRequest(url);
-
-      if (dataResponse['vehicles'] != null) {
-        List<dynamic> providersearchedList = dataResponse['vehicles'];
-        searchedList =
-            providersearchedList.map((json) => Vehicle.fromJson(json)).toList();
+        List<dynamic> providersearchedList = dataResponse['drivers'];
+        searchedList = providersearchedList
+            .map((json) => DriverModel.fromJson(json))
+            .toList();
         notifyListeners();
 
         //List<dynamic> vehicles = dataResponse['vehicles'];
@@ -83,17 +58,18 @@ class ProviderVehicle extends ChangeNotifier {
     }
   }
 
-  Future<String?> editVehicle(String url, Vehicle vehicle) async {
+  Future<String?> editDriver(String url, DriverModel driver) async {
     Map<String, dynamic> mymap = {
-      "name": vehicle.nAME,
-      "plateNo": vehicle.pLATENO,
-      "vehicleTypeId": vehicle.vEHICLETYPEID,
-      "changerId": vehicle.cHANGERID,
+      "name": driver.nAMED,
+      "address": driver.aDDRESSD,
+      "firstName": driver.fIRSTNAMED,
+      "secondName": driver.sECONDNAMED,
+      "changerId": driver.cHANGERIDD,
     };
 
     try {
       Map<String, dynamic> dataResponse = await _crud.putRequest(
-          '$url/${vehicle.iD}', mymap); // Assuming user.id exists
+          '$url/${driver.iDD}', mymap); // Assuming user.id exists
 
       if (dataResponse.isNotEmpty) {
 // Extract the "message" value from the map

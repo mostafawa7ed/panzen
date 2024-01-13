@@ -41,7 +41,7 @@ class ProviderReportData extends ChangeNotifier {
     }
   }
 
-  Future<void> transportaionfeeList(String url, Map<String, String> map) async {
+  Future<void> transportaionfeeList(String url, Map<String, int> map) async {
     try {
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, map);
 

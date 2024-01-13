@@ -52,8 +52,12 @@ class _TransportationFeeState extends State<TransportationFee> {
   FocusNode _numberTonFieldFocus = FocusNode();
 
   DateTime? requestDate;
-  String selected = '';
-
+  VehicleMap? selectedColumn; //= VehicleMap("Name", "الأسم", "NAME");
+  List<VehicleMap> vehicleColumnsItems = [
+    VehicleMap("Name", "الأسم", "NAME"),
+    VehicleMap("Plate Num", "رقم العربة", "PLATE_NO"),
+  ];
+  String SelectedColumn = 'Item 1';
   Future<void> prepareData(BuildContext context) async {
     final ProviderTransportationFee providerTransportationFee =
         Provider.of<ProviderTransportationFee>(context, listen: false);
@@ -116,96 +120,119 @@ class _TransportationFeeState extends State<TransportationFee> {
               },
             ),
           ),
-          Consumer<ProviderTransportationFee>(
-              builder: (context, providerTransportationData, child) {
-            return Container(
-              width: getSizePage(context, 1, 60),
-              child: Autocomplete<Vehicle>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty) {
-                    return const Iterable<Vehicle>.empty();
-                  } else {
-                    // Replace 'otherModelList' with your list of OtherModel objects
-                    List<Vehicle> matches = providerTransportationData
-                        .vehicleList
-                        .where((item) =>
-                            item.nAME != null &&
-                            item.nAME!
-                                .toLowerCase()
-                                .contains(textEditingValue.text.toLowerCase()))
-                        .toList();
+          Row(
+            children: [
+              DropdownButton(
+                value: selectedColumn,
+                items: vehicleColumnsItems
+                    .map<DropdownMenuItem<VehicleMap>>(
+                      (e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(e.nameArabic!),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (VehicleMap? value) => setState(
+                  () {
+                    if (value != null) selectedColumn = value;
+                  },
+                ),
+              ),
+              Text(selectedColumn?.nameArabic ?? ""),
+              Consumer<ProviderTransportationFee>(
+                  builder: (context, providerTransportationData, child) {
+                return Container(
+                  width: getSizePage(context, 1, 60),
+                  child: Autocomplete<Vehicle>(
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      if (textEditingValue.text.isEmpty) {
+                        return const Iterable<Vehicle>.empty();
+                      } else {
+                        // Replace 'otherModelList' with your list of OtherModel objects
+                        List<Vehicle> matches = providerTransportationData
+                            .vehicleList
+                            .where((item) =>
+                                item.nAME != null &&
+                                item.nAME!.toLowerCase().contains(
+                                    textEditingValue.text.toLowerCase()))
+                            .toList();
 
-                    return matches;
-                  }
-                },
-                onSelected: (Vehicle selection) {
-                  selectedVehicle = selection;
+                        return matches;
+                      }
+                    },
+                    onSelected: (Vehicle selection) {
+                      selectedVehicle = selection;
 
-                  // Update the text in the TextFormField when a vehicle is selected
-                  _vehicleController.text = selection.nAME ?? '';
-                  print('You just selected ${selectedVehicle.nAME}');
-                  FocusScope.of(context).requestFocus(_providerFieldFocus);
-                },
-                fieldViewBuilder: (BuildContext context,
-                    TextEditingController textEditingController,
-                    FocusNode focusNode,
-                    VoidCallback onFieldSubmitted) {
-                  _vehicleController = textEditingController;
-                  _vehicleFieldFocus = focusNode;
-                  //Store the controller
-                  return TextFormField(
-                    controller: textEditingController,
-                    focusNode: focusNode,
-                    onChanged: (String value) {
-                      // Additional actions while the text changes, if needed
+                      // Update the text in the TextFormField when a vehicle is selected
+                      _vehicleController.text = selection.nAME ?? '';
+                      print('You just selected ${selectedVehicle.nAME}');
+                      FocusScope.of(context).requestFocus(_providerFieldFocus);
                     },
-                    onFieldSubmitted: (String value) {
-                      // Handle the submitted value, if needed
+                    fieldViewBuilder: (BuildContext context,
+                        TextEditingController textEditingController,
+                        FocusNode focusNode,
+                        VoidCallback onFieldSubmitted) {
+                      _vehicleController = textEditingController;
+                      _vehicleFieldFocus = focusNode;
+                      //Store the controller
+                      return TextFormField(
+                        controller: textEditingController,
+                        focusNode: focusNode,
+                        onChanged: (String value) {
+                          // Additional actions while the text changes, if needed
+                        },
+                        onFieldSubmitted: (String value) {
+                          // Handle the submitted value, if needed
+                        },
+                        decoration: InputDecoration(
+                          labelText:
+                              getLanguage(context, 'typeToSearchVehicle'),
+                          border: OutlineInputBorder(),
+                        ),
+                      );
                     },
-                    decoration: InputDecoration(
-                      labelText: getLanguage(context, 'typeToSearchVehicle'),
-                      border: OutlineInputBorder(),
-                    ),
-                  );
-                },
-                optionsViewBuilder: (BuildContext context,
-                    AutocompleteOnSelected<Vehicle> onSelected,
-                    Iterable<Vehicle> options) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Material(
-                      elevation: 6.0,
-                      child: Container(
-                        constraints: BoxConstraints(maxHeight: 200.0),
-                        child: SingleChildScrollView(
-                          physics: AlwaysScrollableScrollPhysics(),
+                    optionsViewBuilder: (BuildContext context,
+                        AutocompleteOnSelected<Vehicle> onSelected,
+                        Iterable<Vehicle> options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 6.0,
                           child: Container(
-                            width: getSizePage(context, 1, 60),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: options.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final Vehicle option = options.elementAt(index);
-                                return GestureDetector(
-                                  onTap: () {
-                                    onSelected(option);
+                            constraints: BoxConstraints(maxHeight: 200.0),
+                            child: SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              child: Container(
+                                width: getSizePage(context, 1, 60),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: options.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final Vehicle option =
+                                        options.elementAt(index);
+                                    return GestureDetector(
+                                      onTap: () {
+                                        onSelected(option);
+                                      },
+                                      child: ListTile(
+                                        title: Text(
+                                            "${option.nAME ?? ''}  ${option.nUMBEROFTRANSACTIONS ?? ''} ${option.cHANGERID ?? ''} "),
+                                      ),
+                                    );
                                   },
-                                  child: ListTile(
-                                    title: Text(
-                                        "${option.nAME ?? ''}  ${option.nUMBEROFTRANSACTIONS ?? ''} ${option.cHANGERID ?? ''} "),
-                                  ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            );
-          }),
+                      );
+                    },
+                  ),
+                );
+              }),
+            ],
+          ),
           Padding(padding: EdgeInsets.only(top: 20)),
           Consumer<ProviderTransportationFee>(
               builder: (context, providerTransportationData, child) {
@@ -658,6 +685,12 @@ Future<File> generatePDF(List<Vehicle> data) async {
   return file;
 }
 
-
 // File pdfFile =
 //                     await generatePDF(providerTransportationFee.vehicleList);
+class VehicleMap {
+  String? nameArabic;
+  String? nameEnglish;
+  String? column;
+
+  VehicleMap(this.nameArabic, this.nameEnglish, this.column);
+}
