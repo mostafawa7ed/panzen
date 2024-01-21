@@ -12,6 +12,7 @@ import 'package:untitled4/page/transportationFeeDataTable.dart';
 
 import '../data/langaue.dart';
 import 'driver.dart';
+import 'provider.dart';
 import 'reportPage.dart';
 import 'vehicle.dart';
 
@@ -142,6 +143,15 @@ class _MyHomePageState extends State<HomePage> {
                 alignment: Alignment.center,
               ),
             ),
+            // Container(
+            //   decoration: BoxDecoration(
+            //     image: DecorationImage(
+            //       image: AssetImage("assets/images/packground.png"),
+            //       fit: BoxFit.cover,
+            //     ),
+            //   ),
+            //   child: null /* add child content here */,
+            // ),
             Column(
               children: [
                 Center(child: Consumer<ProviderTransportationFee>(
@@ -322,7 +332,7 @@ class _MyHomePageState extends State<HomePage> {
                                 curve: Curves.easeIn,
                               );
                             },
-                            child: Text(getLanguage(context, 'report'))),
+                            child: Text(getLanguage(context, 'Formreport'))),
                       ),
                     ),
                   ],
@@ -363,9 +373,7 @@ class CustomPageView extends StatelessWidget {
             user: user,
           ),
           VehicleTab(user: user, language: language),
-          const Center(
-            child: Text('thid Page'),
-          ),
+          ProviderTab(user: user, language: language),
           TransportationFee(user: user, language: language),
           const ReportTap(),
           TransportationFeeDataTable(user: user, language: language),

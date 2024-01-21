@@ -24,8 +24,8 @@ class _DriverTabState extends State<DriverTab> {
   String selected = '';
   DriverMap? selectedColumn;
   List<DriverMap> vehicleColumnsItems = [
-    DriverMap("Name", "الأسم", "NAME"),
-    DriverMap("Address", "العنوان", "ADDRESS"),
+    DriverMap("name", "NAME"),
+    DriverMap("address", "ADDRESS"),
   ];
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerFirstName,
                         decoration: InputDecoration(
-                          labelText: 'FirstName',
+                          labelText: getLanguage(context, 'firstNameDriver'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -83,7 +83,7 @@ class _DriverTabState extends State<DriverTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a name';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -101,7 +101,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerSecondName,
                         decoration: InputDecoration(
-                          labelText: 'ScondName',
+                          labelText: getLanguage(context, 'secondName'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -114,7 +114,7 @@ class _DriverTabState extends State<DriverTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a name';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -132,7 +132,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerAddress,
                         decoration: InputDecoration(
-                          labelText: 'Address',
+                          labelText: getLanguage(context, 'address'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -145,7 +145,7 @@ class _DriverTabState extends State<DriverTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a plate number';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -180,7 +180,7 @@ class _DriverTabState extends State<DriverTab> {
                         providerDriver.changeMessage(message);
                       }
                     },
-                    child: Text('add'),
+                    child: Text(getLanguage(context, 'addDriver')),
                   ),
                 ],
               ),
@@ -208,7 +208,8 @@ class _DriverTabState extends State<DriverTab> {
                               },
                               icon: Icon(Icons.add)),
                         ),
-                        Expanded(flex: 10, child: Text("add")),
+                        Expanded(
+                            flex: 10, child: Text(getLanguage(context, 'add'))),
                         Expanded(flex: 40, child: SizedBox()),
                       ],
                     );
@@ -221,12 +222,14 @@ class _DriverTabState extends State<DriverTab> {
                         Expanded(
                           flex: 5,
                           child: DropdownButton(
+                            hint: Text(getLanguage(context, 'filter')),
                             value: selectedColumn,
                             items: vehicleColumnsItems
                                 .map<DropdownMenuItem<DriverMap>>(
                                   (e) => DropdownMenuItem(
                                     value: e,
-                                    child: Text(e.nameEnglish!),
+                                    child: Text(
+                                        getLanguage(context, e.nameEnglish!)),
                                   ),
                                 )
                                 .toList(),
@@ -244,7 +247,8 @@ class _DriverTabState extends State<DriverTab> {
                             width: getSizePage(context, 1, 60),
                             child: TextField(
                               decoration: InputDecoration(
-                                labelText: "",
+                                labelText:
+                                    getLanguage(context, 'typeToSearchDriver'),
                                 border: OutlineInputBorder(),
                                 fillColor: Colors.white38,
                                 filled: true,
@@ -270,52 +274,57 @@ class _DriverTabState extends State<DriverTab> {
                   ),
                   Consumer<ProviderDriver>(
                       builder: (context, providerDriver, child) {
-                    return Container(
-                      padding: EdgeInsets.only(top: 20),
-                      width: getSizePage(context, 1, 60),
-                      height: getSizePage(context, 2, 30),
-                      child: ListView.builder(
-                        //shrinkWrap: true,
-                        itemCount: providerDriver.searchedList.length,
-                        itemBuilder: (context, index) {
-                          DriverModel currentObject =
-                              providerDriver.searchedList[index];
-                          return Card(
-                            child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Container(
-                                    child: Row(
-                                  children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text((index + 1).toString())),
-                                    Expanded(
-                                        flex: 2,
-                                        child: Text(currentObject.nAMED!)),
-                                    Expanded(
-                                        flex: 2,
-                                        child:
-                                            Text('${currentObject.aDDRESSD}')),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                          onPressed: () {
-                                            driverModelEdit = providerDriver
-                                                .searchedList[index];
-                                            _controllerFirstName.text =
-                                                currentObject.fIRSTNAMED
-                                                    .toString();
-                                            _controllerSecondName.text =
-                                                currentObject.sECONDNAMED
-                                                    .toString();
-                                            _controllerAddress.text =
-                                                currentObject.aDDRESSD!;
-                                          },
-                                          child: Text("Select")),
-                                    ),
-                                  ],
-                                ))),
-                          );
-                        },
+                    return Visibility(
+                      visible: providerDriver.searchedList.length > 0 &&
+                          _controllerSearched.text != "",
+                      child: Container(
+                        padding: EdgeInsets.only(top: 20),
+                        width: getSizePage(context, 1, 60),
+                        height: getSizePage(context, 2, 30),
+                        child: ListView.builder(
+                          //shrinkWrap: true,
+                          itemCount: providerDriver.searchedList.length,
+                          itemBuilder: (context, index) {
+                            DriverModel currentObject =
+                                providerDriver.searchedList[index];
+                            return Card(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Container(
+                                      child: Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: Text((index + 1).toString())),
+                                      Expanded(
+                                          flex: 2,
+                                          child: Text(currentObject.nAMED!)),
+                                      Expanded(
+                                          flex: 2,
+                                          child: Text(
+                                              '${currentObject.aDDRESSD}')),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                            onPressed: () {
+                                              driverModelEdit = providerDriver
+                                                  .searchedList[index];
+                                              _controllerFirstName.text =
+                                                  currentObject.fIRSTNAMED
+                                                      .toString();
+                                              _controllerSecondName.text =
+                                                  currentObject.sECONDNAMED
+                                                      .toString();
+                                              _controllerAddress.text =
+                                                  currentObject.aDDRESSD!;
+                                            },
+                                            child: Text(getLanguage(
+                                                context, 'select'))),
+                                      ),
+                                    ],
+                                  ))),
+                            );
+                          },
+                        ),
                       ),
                     );
                   }),
@@ -327,7 +336,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerFirstName,
                         decoration: InputDecoration(
-                          labelText: 'FirsrtName',
+                          labelText: getLanguage(context, 'firstNameDriver'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -340,7 +349,7 @@ class _DriverTabState extends State<DriverTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a name';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -358,7 +367,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerSecondName,
                         decoration: InputDecoration(
-                          labelText: 'Second Name',
+                          labelText: getLanguage(context, 'secondName'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -371,7 +380,7 @@ class _DriverTabState extends State<DriverTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a plate number';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -389,7 +398,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerAddress,
                         decoration: InputDecoration(
-                          labelText: 'Address',
+                          labelText: getLanguage(context, 'address'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -402,7 +411,7 @@ class _DriverTabState extends State<DriverTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a plate number';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -435,12 +444,12 @@ class _DriverTabState extends State<DriverTab> {
                           _controllerSecondName.clear();
                           _controllerAddress.clear();
                           Text message =
-                              Text(getLanguage(context, 'messageSuccess'));
+                              Text(getLanguage(context, 'messageEditSuccess'));
                           providerDriver.changeMessage(message);
                         }
                       }
                     },
-                    child: Text('Submit'),
+                    child: Text(getLanguage(context, 'edit')),
                   ),
                 ],
               ),
@@ -461,7 +470,7 @@ class DriverMap {
   String? nameEnglish;
   String? column;
 
-  DriverMap(this.nameArabic, this.nameEnglish, this.column);
+  DriverMap(this.nameEnglish, this.column);
 }
 // File pdfFile =
 //                     await generatePDF(providerTransportationFee.vehicleList);

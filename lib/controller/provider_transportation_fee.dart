@@ -27,7 +27,9 @@ class ProviderTransportationFee extends ChangeNotifier {
       "totalValue": double.tryParse(transportationFee.totalValue!) ?? 1,
       "numberOfTon": double.tryParse(transportationFee.numberOfTon!) ?? 1,
       "requestDate": requestDate.toString(),
-      "changerId": int.tryParse(transportationFee.changerId!) ?? 1
+      "changerId": int.tryParse(transportationFee.changerId!) ?? 1,
+      "providersReciverId": int.tryParse(transportationFee.providersReciverId!),
+      "type": transportationFee.type
     };
     try {
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, mymap);

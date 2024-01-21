@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../controller/provider_report.dart';
+import '../data/langaue.dart';
 import '../data/staticdata.dart';
 import '../model/transportationfeeReportMode.dart';
 import '../model/user_model.dart';
@@ -39,6 +40,14 @@ class _TransportationFeeDataTableState
     super.initState();
   }
 
+  // int total = 0;
+  final TextStyle customTextStyle = const TextStyle(
+    color: Color.fromARGB(255, 0, 0, 0),
+    fontSize: 16.0,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.normal,
+    // You can add more styles as needed
+  );
   final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
@@ -52,42 +61,85 @@ class _TransportationFeeDataTableState
         controller: _scrollController,
         child: Column(
           children: [
-            const Card(
+            Card(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 0.8),
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(""),
+                      flex: 1,
+                      child: Text(
+                          style: customTextStyle, getLanguage(context, 's')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 2,
+                      child: Text(
+                          style: customTextStyle, getLanguage(context, 'id')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 2,
+                      child: Text(
+                          style: customTextStyle, getLanguage(context, 'type')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'providerSender')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'providerReceiver')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'driverName')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'numberOfTon')),
+                    ),
+                    // Expanded(
+                    //   flex: 3,
+                    //   child: Text(
+                    //       style: customTextStyle,
+                    //       getLanguage(context, 'providerDeDateStart')),
+                    // ),
+                    // Expanded(
+                    //   flex: 3,
+                    //   child: Text(
+                    //       style: customTextStyle,
+                    //       getLanguage(context, 'providerDeDateEnd')),
+                    // ),
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'requestDate')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'totalAmount')),
                     ),
                     Expanded(
-                      child: Text(""),
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'amount')),
                     ),
-                    Expanded(
-                      child: Text(""),
-                    ),
-                    Expanded(child: Text("")),
+                    // Expanded(
+                    //     flex: 3,
+                    //     child: Text(
+                    //         style: customTextStyle,
+                    //         getLanguage(context, 'providerDeDateEnd'))),
                   ],
                 ),
               ),
@@ -98,6 +150,8 @@ class _TransportationFeeDataTableState
                 shrinkWrap: true,
                 itemCount: providerReportData.transportaionfeeallList.length,
                 itemBuilder: (context, index) {
+                  //  total = total +
+                  providerReportData.transportaionfeeallList[index].totalValue!;
                   return CustomRowWidget(
                     transportaionfeeReport:
                         providerReportData.transportaionfeeallList[index],
@@ -248,16 +302,28 @@ class CustomRowWidget extends StatelessWidget {
                 child: Text(style: customTextStyle, currentIndex.toString()),
               ),
               Expanded(
-                flex: 1,
+                flex: 2,
                 child: Text(
                     style: customTextStyle,
                     transportaionfeeReport.transportationFeeId.toString()),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.type.toString()),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
                     style: customTextStyle,
                     transportaionfeeReport.providerName.toString()),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                    style: customTextStyle,
+                    transportaionfeeReport.providerReceiverName.toString()),
               ),
               Expanded(
                 flex: 3,
@@ -271,14 +337,14 @@ class CustomRowWidget extends StatelessWidget {
                     style: customTextStyle,
                     transportaionfeeReport.numberOfTon.toString()),
               ),
-              Expanded(
-                flex: 3,
-                child: Text(style: customTextStyle, startDate.toString()),
-              ),
-              Expanded(
-                flex: 3,
-                child: Text(style: customTextStyle, endDate!),
-              ),
+              // Expanded(
+              //   flex: 3,
+              //   child: Text(style: customTextStyle, startDate.toString()),
+              // ),
+              // Expanded(
+              //   flex: 3,
+              //   child: Text(style: customTextStyle, endDate!),
+              // ),
               Expanded(
                 flex: 3,
                 child: Text(style: customTextStyle, daterequest!),
@@ -296,13 +362,13 @@ class CustomRowWidget extends StatelessWidget {
                     transportaionfeeReport.providerDetailsAmountPerTon
                         .toString()),
               ),
-              Expanded(
-                flex: 3,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  child: const Text("Action"),
-                ),
-              ),
+              // Expanded(
+              //   flex: 3,
+              //   child: ElevatedButton(
+              //     onPressed: () {},
+              //     child: const Text("Action"),
+              //   ),
+              // ),
             ],
           ),
         ),

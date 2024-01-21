@@ -1,15 +1,8 @@
-import 'dart:io';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled4/model/user_model.dart';
 import 'package:untitled4/model/vehicle_model.dart';
 import 'package:flutter/material.dart';
-
-import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-
-import 'package:open_file/open_file.dart';
 
 import '../controller/provider_vehicle.dart';
 import '../data/langaue.dart';
@@ -29,8 +22,8 @@ class _VehicleTabState extends State<VehicleTab> {
   String selected = '';
   VehicleMap? selectedColumn;
   List<VehicleMap> vehicleColumnsItems = [
-    VehicleMap("Name", "الأسم", "NAME"),
-    VehicleMap("Plate Num", "رقم العربة", "PLATE_NO"),
+    VehicleMap("Name", "NAME"),
+    VehicleMap("PlateNum", "PLATE_NO"),
   ];
   @override
   void initState() {
@@ -49,8 +42,8 @@ class _VehicleTabState extends State<VehicleTab> {
 
   int? vehicletype;
   List<VehicleType> vehicleTypes = [
-    VehicleType(1, 'عربة'),
-    VehicleType(2, 'مقطورة'),
+    VehicleType(1, 'vehiclee'),
+    VehicleType(2, 'trailer'),
     // Add more VehicleType objects as needed
   ];
   Vehicle? editedvehicle;
@@ -85,7 +78,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         controller: _controllerName,
                         focusNode: _focusNodeName,
                         decoration: InputDecoration(
-                          labelText: 'Name',
+                          labelText: getLanguage(context, 'Name'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -98,7 +91,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a name';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -117,7 +110,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         controller: _controllerPlateNo,
                         focusNode: _focusNodePlateNo,
                         decoration: InputDecoration(
-                          labelText: 'Plate Number',
+                          labelText: getLanguage(context, 'PlateNum'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -130,7 +123,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a plate number';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -145,7 +138,7 @@ class _VehicleTabState extends State<VehicleTab> {
                     width: getSizePage(context, 1, 55),
                     child: DropdownButtonFormField<int>(
                       decoration: InputDecoration(
-                        labelText: 'Vehicle Type ID',
+                        labelText: getLanguage(context, 'vehicleType'),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
@@ -157,7 +150,7 @@ class _VehicleTabState extends State<VehicleTab> {
                       items: vehicleTypes.map((VehicleType type) {
                         return DropdownMenuItem<int>(
                           value: type.id,
-                          child: Text(type.name),
+                          child: Text(getLanguage(context, type.name)),
                         );
                       }).toList(),
                       onChanged: (int? value) {
@@ -167,7 +160,7 @@ class _VehicleTabState extends State<VehicleTab> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return 'Please select a vehicle type';
+                          return getLanguage(context, 'vaildVehicleType');
                         }
                         return null;
                       },
@@ -197,7 +190,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         providerVehicle.changeMessage(message);
                       }
                     },
-                    child: Text('add'),
+                    child: Text(getLanguage(context, 'add')),
                   ),
                 ],
               ),
@@ -225,7 +218,8 @@ class _VehicleTabState extends State<VehicleTab> {
                               },
                               icon: Icon(Icons.add)),
                         ),
-                        Expanded(flex: 10, child: Text("add")),
+                        Expanded(
+                            flex: 10, child: Text(getLanguage(context, 'add'))),
                         Expanded(flex: 40, child: SizedBox()),
                       ],
                     );
@@ -238,12 +232,14 @@ class _VehicleTabState extends State<VehicleTab> {
                         Expanded(
                           flex: 5,
                           child: DropdownButton(
+                            hint: Text(getLanguage(context, 'filter')),
                             value: selectedColumn,
                             items: vehicleColumnsItems
                                 .map<DropdownMenuItem<VehicleMap>>(
                                   (e) => DropdownMenuItem(
                                     value: e,
-                                    child: Text(e.nameEnglish!),
+                                    child: Text(
+                                        getLanguage(context, e.nameEnglish!)),
                                   ),
                                 )
                                 .toList(),
@@ -261,7 +257,8 @@ class _VehicleTabState extends State<VehicleTab> {
                             width: getSizePage(context, 1, 60),
                             child: TextField(
                               decoration: InputDecoration(
-                                labelText: "",
+                                labelText:
+                                    getLanguage(context, 'typeToSearchVehicle'),
                                 border: OutlineInputBorder(),
                                 fillColor: Colors.white38,
                                 filled: true,
@@ -287,74 +284,61 @@ class _VehicleTabState extends State<VehicleTab> {
                   ),
                   Consumer<ProviderVehicle>(
                       builder: (context, providerVehicle, child) {
-                    return Container(
-                      padding: EdgeInsets.only(top: 20),
-                      width: getSizePage(context, 1, 60),
-                      height: getSizePage(context, 2, 30),
-                      child: ListView.builder(
-                        //shrinkWrap: true,
-                        itemCount: providerVehicle.searchedList.length,
-                        itemBuilder: (context, index) {
-                          Vehicle currentObject =
-                              providerVehicle.searchedList[index];
-                          return Card(
-                            child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Container(
-                                    child: Row(
-                                  children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text((index + 1).toString())),
-                                    Expanded(
+                    return Visibility(
+                      visible: providerVehicle.searchedList.length > 0 &&
+                          _controllerSearched != '',
+                      child: Container(
+                        padding: EdgeInsets.only(top: 20),
+                        width: getSizePage(context, 1, 60),
+                        height: getSizePage(context, 2, 30),
+                        child: ListView.builder(
+                          //shrinkWrap: true,
+                          itemCount: providerVehicle.searchedList.length,
+                          itemBuilder: (context, index) {
+                            Vehicle currentObject =
+                                providerVehicle.searchedList[index];
+                            return Card(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Container(
+                                      child: Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: Text((index + 1).toString())),
+                                      Expanded(
+                                          flex: 2,
+                                          child: Text(currentObject.nAME!)),
+                                      Expanded(
+                                          flex: 2,
+                                          child:
+                                              Text('${currentObject.pLATENO}')),
+                                      Expanded(
                                         flex: 2,
-                                        child: Text(currentObject.nAME!)),
-                                    Expanded(
-                                        flex: 2,
-                                        child:
-                                            Text('${currentObject.pLATENO}')),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                          '${currentObject.nUMBEROFTRANSACTIONS}'),
-                                    ),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                          onPressed: () {
-                                            editedvehicle = providerVehicle
-                                                .searchedList[index];
-                                            _controllerPlateNo.text =
-                                                currentObject.pLATENO
-                                                    .toString();
-                                            _controllerName.text =
-                                                currentObject.nAME!;
-                                            _selectedVehicleTypeId =
-                                                currentObject.vEHICLETYPEID;
-                                          },
-                                          child: Text("Select")),
-                                    ),
-                                  ],
-                                ))),
-                          );
-                          // return ListTile(
-                          //   leading: Text((index + 1).toString()),
-                          //   title: Text(currentObject.nAME!),
-                          //   trailing: ElevatedButton(
-                          //       onPressed: () {
-                          //         editedvehicle =
-                          //             providerVehicle.searchedList[index];
-                          //         _controllerPlateNo.text =
-                          //             currentObject.pLATENO.toString();
-                          //         _controllerName.text = currentObject.nAME!;
-                          //         _selectedVehicleTypeId =
-                          //             currentObject.vEHICLETYPEID;
-                          //       },
-                          //       child: Text("Select")),
-                          //   subtitle: Text(
-                          //       '${currentObject.pLATENO} - ${currentObject.nUMBEROFTRANSACTIONS}'),
-                          //   onTap: () {},
-                          // );
-                        },
+                                        child: Text(
+                                            '${currentObject.nUMBEROFTRANSACTIONS}'),
+                                      ),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                            onPressed: () {
+                                              editedvehicle = providerVehicle
+                                                  .searchedList[index];
+                                              _controllerPlateNo.text =
+                                                  currentObject.pLATENO
+                                                      .toString();
+                                              _controllerName.text =
+                                                  currentObject.nAME!;
+                                              _selectedVehicleTypeId =
+                                                  currentObject.vEHICLETYPEID;
+                                            },
+                                            child: Text(getLanguage(
+                                                context, 'select'))),
+                                      ),
+                                    ],
+                                  ))),
+                            );
+                          },
+                        ),
                       ),
                     );
                   }),
@@ -367,7 +351,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         controller: _controllerName,
                         focusNode: _focusNodeName,
                         decoration: InputDecoration(
-                          labelText: 'Name',
+                          labelText: getLanguage(context, 'Name'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -380,7 +364,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a name';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -399,7 +383,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         controller: _controllerPlateNo,
                         focusNode: _focusNodePlateNo,
                         decoration: InputDecoration(
-                          labelText: 'Plate Number',
+                          labelText: getLanguage(context, 'PlateNum'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -412,7 +396,7 @@ class _VehicleTabState extends State<VehicleTab> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a plate number';
+                            return getLanguage(context, 'fieldsEmpty');
                           }
                           return null;
                         },
@@ -427,7 +411,7 @@ class _VehicleTabState extends State<VehicleTab> {
                     width: getSizePage(context, 1, 55),
                     child: DropdownButtonFormField<int>(
                       decoration: InputDecoration(
-                        labelText: 'Vehicle Type ID',
+                        labelText: getLanguage(context, 'vehicleType'),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
@@ -449,7 +433,7 @@ class _VehicleTabState extends State<VehicleTab> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return 'Please select a vehicle type';
+                          return getLanguage(context, 'vaildVehicleType');
                         }
                         return null;
                       },
@@ -476,12 +460,12 @@ class _VehicleTabState extends State<VehicleTab> {
                           _controllerName.clear();
                           _controllerPlateNo.clear();
                           Text message =
-                              Text(getLanguage(context, 'messageSuccess'));
+                              Text(getLanguage(context, 'messageEditSuccess'));
                           providerVehicle.changeMessage(message);
                         }
                       }
                     },
-                    child: Text('Submit'),
+                    child: Text(getLanguage(context, 'edit')),
                   ),
                 ],
               ),
@@ -498,11 +482,10 @@ class VehicleType {
 }
 
 class VehicleMap {
-  String? nameArabic;
   String? nameEnglish;
   String? column;
 
-  VehicleMap(this.nameArabic, this.nameEnglish, this.column);
+  VehicleMap(this.nameEnglish, this.column);
 }
 // File pdfFile =
 //                     await generatePDF(providerTransportationFee.vehicleList);

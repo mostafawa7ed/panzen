@@ -6,6 +6,7 @@ class TransportaionfeeReport {
   String? providerDetailsStartDate;
   String? providerDetailsEndDate;
   String? providerName;
+  String? providerReceiverName;
   String? providerAddress;
   int? providerAmountPerTon;
   String? changerUsername;
@@ -14,6 +15,7 @@ class TransportaionfeeReport {
   int? numberOfTon;
   String? requestDate;
   String? timeStamp;
+  String? type;
 
   TransportaionfeeReport(
       {this.transportationFeeId,
@@ -23,6 +25,7 @@ class TransportaionfeeReport {
       this.providerDetailsStartDate,
       this.providerDetailsEndDate,
       this.providerName,
+      this.providerReceiverName,
       this.providerAddress,
       this.providerAmountPerTon,
       this.changerUsername,
@@ -30,7 +33,8 @@ class TransportaionfeeReport {
       this.totalValue,
       this.numberOfTon,
       this.requestDate,
-      this.timeStamp});
+      this.timeStamp,
+      this.type});
 
   TransportaionfeeReport.fromJson(Map<String, dynamic> json) {
     transportationFeeId = json['transportation_fee_id'];
@@ -40,6 +44,7 @@ class TransportaionfeeReport {
     providerDetailsStartDate = json['provider_details_start_date'];
     providerDetailsEndDate = json['provider_details_end_date'];
     providerName = json['provider_name'];
+    providerReceiverName = json['provider_receiver_name'];
     providerAddress = json['provider_address'];
     providerAmountPerTon = json['provider_amount_per_ton'];
     changerUsername = json['changer_username'];
@@ -48,6 +53,7 @@ class TransportaionfeeReport {
     numberOfTon = json['number_of_ton'];
     requestDate = json['request_date'];
     timeStamp = json['time_stamp'];
+    type = json['type'];
   }
 
   Map<String, dynamic> toJson() {
@@ -59,6 +65,7 @@ class TransportaionfeeReport {
     data['provider_details_start_date'] = this.providerDetailsStartDate;
     data['provider_details_end_date'] = this.providerDetailsEndDate;
     data['provider_name'] = this.providerName;
+    data['provider_receiver_name'] = this.providerReceiverName;
     data['provider_address'] = this.providerAddress;
     data['provider_amount_per_ton'] = this.providerAmountPerTon;
     data['changer_username'] = this.changerUsername;
@@ -67,6 +74,7 @@ class TransportaionfeeReport {
     data['number_of_ton'] = this.numberOfTon;
     data['request_date'] = this.requestDate;
     data['time_stamp'] = this.timeStamp;
+    data['type'] = this.type;
     return data;
   }
 }

@@ -28,9 +28,20 @@ class StaticData {
   static const String urlDriverSearch = "${urlConnectionConst}driver/search";
   static const String urlDriverEdit = "${urlConnectionConst}driver/update";
 
+  static const String urlAddProvider = "${urlConnectionConst}provider/add";
+  static const String urlProviderSearch =
+      "${urlConnectionConst}provider/search";
+  static const String urlProviderEdit = "${urlConnectionConst}provider/update";
+
+  static const String urlAddProviderDetails =
+      "${urlConnectionConst}providerDetails/add";
+
   ///transportationfee/pagination
   static const String urlTransportationDatapagination =
       "${urlConnectionConst}joins/transportationfee/pagination";
+
+  static const String urlProviderDetailsSearch =
+      "${urlConnectionConst}providerDetails/search";
 //http://localhost:5000/api/transportationFee/add
 ////////////////////////// textDirection /////////////////////
 ////////////////////   Images path  //////////////////////////////////

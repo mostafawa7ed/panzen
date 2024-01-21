@@ -134,22 +134,26 @@ Future<File> generatePDF(List<TransportaionfeeReport> data, DateTime fromDate,
       ? [
           [
             'رقم العملية',
-            'تاريخ العملية',
+            'تاريخ الشحن',
             'عدد الاطنان',
             'سعر الكمية كاملة',
             'سعر الطن',
-            'رقم العربية',
+            //'رقم العربية',
             'السائق',
-            'شركة',
+            'الشركة المستلمة',
+            'الشركة المسلمة',
+            'النوع',
             '  س  ',
           ] // Arabic column headers
         ]
       : [
           [
             '  S  ',
+            'type',
             'provider',
+            'Company Receiver',
             'Driver',
-            'Car Number',
+            //'Car Number',
             'value for one Ton',
             'Cal Total Value',
             'Number Of Ton',
@@ -159,19 +163,23 @@ Future<File> generatePDF(List<TransportaionfeeReport> data, DateTime fromDate,
         ];
   int index = 1;
   DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+  double quantity = 0.0;
   currentLocal == const Locale('ar')
       ? data.forEach((object) {
           DateTime daterequest = DateTime.parse(object.requestDate!);
           final String formatted = formatter.format(daterequest);
+          quantity = quantity + object.numberOfTon!;
           tableData.add([
             object.transportationFeeId.toString(),
             formatted,
             object.providerDetailsAmountPerTon.toString(),
             object.totalValue.toString(),
-            object.providerAmountPerTon.toString(),
+            //object.providerAmountPerTon.toString(),
             object.numberOfTon.toString(),
             object.driverName.toString(),
+            object.providerReceiverName.toString(),
             object.providerName.toString(),
+            object.type.toString(),
             index.toString(),
           ]);
           index = index + 1;
@@ -179,12 +187,15 @@ Future<File> generatePDF(List<TransportaionfeeReport> data, DateTime fromDate,
       : data.forEach((object) {
           DateTime daterequest = DateTime.parse(object.requestDate!);
           final String formatted = formatter.format(daterequest);
+          quantity = quantity + object.numberOfTon!;
           tableData.add([
             index.toString(),
+            object.type.toString(),
             object.providerName.toString(),
+            object.providerReceiverName.toString(),
             object.driverName.toString(),
             object.numberOfTon.toString(),
-            object.providerAmountPerTon.toString(),
+            //object.providerAmountPerTon.toString(),
             object.totalValue.toString(),
             object.providerDetailsAmountPerTon.toString(),
             formatted,
@@ -211,25 +222,44 @@ Future<File> generatePDF(List<TransportaionfeeReport> data, DateTime fromDate,
       cellStyle: pw.TextStyle(fontSize: 7, font: arFont),
       tableDirection: pw.TextDirection.rtl,
     );
-
+    int page = 0;
     pdf.addPage(
       pw.Page(
         textDirection: pw.TextDirection.rtl,
         build: (pw.Context context) {
-          return pw.Center(
-            child: pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.center,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                if (i == 0)
+          page = page + 1;
+          return pw.Column(
+            children: [
+              if (i == 0)
+                pw.Column(children: [
+                  pw.Text(
+                      textAlign: pw.TextAlign.left,
+                      ' ${getLanguage(mycontext, "companyName")}',
+                      style: pw.TextStyle(font: arFont, fontSize: 5)),
+                  pw.Text(
+                      textAlign: pw.TextAlign.left,
+                      ' ${getLanguage(mycontext, "DMG")}',
+                      style: pw.TextStyle(font: arFont, fontSize: 5)),
+                  pw.Text(
+                      textAlign: pw.TextAlign.left,
+                      ' ${getLanguage(mycontext, "dahpmashor")}',
+                      style: pw.TextStyle(font: arFont, fontSize: 5)),
+                  pw.Text(
+                      textAlign: pw.TextAlign.left,
+                      ' ${getLanguage(mycontext, "companyNokeName")}',
+                      style: pw.TextStyle(font: arFont, fontSize: 5)),
                   pw.Text(
                       textAlign: pw.TextAlign.center,
                       ' ${getLanguage(mycontext, "allDataFromdate")} $fromDate1 ${getLanguage(mycontext, 'toDate')} $todate1',
-                      style: pw.TextStyle(font: arFont, fontSize: 10)),
-                pw.SizedBox(height: 20),
-                pdfTable,
-              ],
-            ),
+                      style: pw.TextStyle(font: arFont, fontSize: 8))
+                ]),
+              pw.SizedBox(height: 20),
+              pdfTable,
+              if (dividedData.length == page)
+                pw.Text(
+                    style: pw.TextStyle(font: arFont, fontSize: 8),
+                    '${getLanguage(mycontext, "total")}            $quantity'),
+            ],
           );
         },
       ),

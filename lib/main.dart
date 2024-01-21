@@ -9,6 +9,8 @@ import 'package:untitled4/page/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled4/page/login.dart';
 
+import 'controller/provider_provider.dart';
+import 'controller/provider_providerDetails.dart';
 import 'controller/provider_vehicle.dart';
 import 'controller/provider_driver.dart';
 import 'page/transportationFeeDataTable.dart';
@@ -25,6 +27,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => ProviderReportData()),
         ChangeNotifierProvider(create: (context) => ProviderVehicle()),
         ChangeNotifierProvider(create: (context) => ProviderDriver()),
+        ChangeNotifierProvider(create: (context) => ProviderProvider()),
+        ChangeNotifierProvider(create: (context) => ProviderProviderDetails()),
       ],
       child: MyApp(Language: language),
     ),

@@ -3,7 +3,7 @@ class ProviderDetails {
   int? pROVIDERSID;
   String? sTARTDATE;
   String? eNDDATE;
-  int? aMMOUNTPERTON;
+  double? aMMOUNTPERTON;
   int? cHANGERID;
   String? tIMESTAMP;
 
@@ -17,12 +17,19 @@ class ProviderDetails {
       this.tIMESTAMP});
 
   ProviderDetails.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
-    pROVIDERSID = json['PROVIDERS_ID'];
+    iD = int.tryParse(json['ID'].toString());
+    pROVIDERSID = int.tryParse(json['PROVIDERS_ID'].toString());
     sTARTDATE = json['START_DATE'];
     eNDDATE = json['END_DATE'];
-    aMMOUNTPERTON = json['AMMOUNT_PER_TON'];
-    cHANGERID = json['CHANGER_ID'];
+
+    // Parse AMMOUNT_PER_TON as a double or set it to null if not present
+    aMMOUNTPERTON = json['AMMOUNT_PER_TON'] != null
+        ? (json['AMMOUNT_PER_TON'] is int
+            ? (json['AMMOUNT_PER_TON'] as int).toDouble()
+            : json['AMMOUNT_PER_TON'])
+        : null;
+
+    cHANGERID = int.tryParse(json['CHANGER_ID'].toString());
     tIMESTAMP = json['TIME_STAMP'];
   }
 
