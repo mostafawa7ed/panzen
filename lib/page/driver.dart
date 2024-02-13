@@ -25,7 +25,7 @@ class _DriverTabState extends State<DriverTab> {
   DriverMap? selectedColumn;
   List<DriverMap> vehicleColumnsItems = [
     DriverMap("name", "NAME"),
-    DriverMap("address", "ADDRESS"),
+    DriverMap("license", "ADDRESS"),
   ];
   @override
   void initState() {
@@ -52,11 +52,13 @@ class _DriverTabState extends State<DriverTab> {
                 children: [
                   Consumer<ProviderDriver>(
                       builder: (context, providerDriver, child) {
-                    return IconButton(
+                    return ElevatedButton(
                         onPressed: () {
-                          addEdit = 2;
+                          setState(() {
+                            addEdit = 2;
+                          });
                         },
-                        icon: Icon(Icons.edit));
+                        child: Text(getLanguage(context, 'searchAndEdit')));
                   }),
                   Consumer<ProviderDriver>(
                       builder: (context, providerDriver, child) {
@@ -132,7 +134,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerAddress,
                         decoration: InputDecoration(
-                          labelText: getLanguage(context, 'address'),
+                          labelText: getLanguage(context, 'license'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -175,8 +177,14 @@ class _DriverTabState extends State<DriverTab> {
                         _controllerAddress.clear();
                         _controllerFirstName.clear();
                         _controllerSecondName.clear();
-                        Text message =
-                            Text(getLanguage(context, 'messageSuccess'));
+                        Text message = Text(
+                          getLanguage(context, 'messageSuccess'),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Color.fromARGB(255, 31, 124, 19)),
+                        );
+
                         providerDriver.changeMessage(message);
                       }
                     },
@@ -199,18 +207,15 @@ class _DriverTabState extends State<DriverTab> {
                     return Row(
                       children: [
                         Expanded(
-                          flex: 10,
-                          child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  addEdit = 1;
-                                });
-                              },
-                              icon: Icon(Icons.add)),
-                        ),
-                        Expanded(
-                            flex: 10, child: Text(getLanguage(context, 'add'))),
-                        Expanded(flex: 40, child: SizedBox()),
+                            flex: 10,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    addEdit = 1;
+                                  });
+                                },
+                                child: Text(getLanguage(context, 'add')))),
+                        Expanded(flex: 50, child: SizedBox()),
                       ],
                     );
                   }),
@@ -236,6 +241,12 @@ class _DriverTabState extends State<DriverTab> {
                             onChanged: (DriverMap? value) => setState(
                               () {
                                 if (value != null) selectedColumn = value;
+                                String url = StaticData.urlDriverSearch +
+                                    '?column=NAME&value= ';
+                                final ProviderDriver providerDriver =
+                                    Provider.of<ProviderDriver>(context,
+                                        listen: false);
+                                providerDriver.getSearchedDriverData(url);
                               },
                             ),
                           ),
@@ -268,15 +279,32 @@ class _DriverTabState extends State<DriverTab> {
                             ),
                           ),
                         ),
-                        Expanded(flex: 8, child: SizedBox()),
+                        ElevatedButton(
+                            onPressed: () async {
+                              String url = StaticData.urlDriverSearch +
+                                  '?column=NAME&value= ';
+                              final ProviderDriver providerDriver =
+                                  Provider.of<ProviderDriver>(context,
+                                      listen: false);
+                              await providerDriver.getSearchedDriverData(url);
+                            },
+                            child: Text(getLanguage(context, 'search'))),
+                        ElevatedButton(
+                            onPressed: () async {
+                              final ProviderDriver providerDriver =
+                                  Provider.of<ProviderDriver>(context,
+                                      listen: false);
+                              await providerDriver.getSearchedDriverMakeEmpty();
+                            },
+                            child: Text(getLanguage(context, 'dismissSearch'))),
+                        Expanded(child: SizedBox()),
                       ],
                     ),
                   ),
                   Consumer<ProviderDriver>(
                       builder: (context, providerDriver, child) {
                     return Visibility(
-                      visible: providerDriver.searchedList.length > 0 &&
-                          _controllerSearched.text != "",
+                      visible: providerDriver.searchedList.length > 0,
                       child: Container(
                         padding: EdgeInsets.only(top: 20),
                         width: getSizePage(context, 1, 60),
@@ -398,7 +426,7 @@ class _DriverTabState extends State<DriverTab> {
                       child: TextFormField(
                         controller: _controllerAddress,
                         decoration: InputDecoration(
-                          labelText: getLanguage(context, 'address'),
+                          labelText: getLanguage(context, 'license'),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -427,24 +455,33 @@ class _DriverTabState extends State<DriverTab> {
                         _formKey.currentState!.save();
                         final ProviderDriver providerDriver =
                             Provider.of<ProviderDriver>(context, listen: false);
-                        driverModelEdit!.nAMED = _controllerFirstName.text +
-                            ' ' +
-                            _controllerSecondName.text;
-                        driverModelEdit!.fIRSTNAMED = _controllerFirstName.text;
-                        driverModelEdit!.sECONDNAMED =
-                            _controllerSecondName.text;
-                        driverModelEdit!.aDDRESSD = _controllerAddress.text;
-                        driverModelEdit!.cHANGERIDD =
-                            int.tryParse(widget.user.id!);
-
                         if (driverModelEdit != null) {
+                          driverModelEdit!.nAMED = _controllerFirstName.text +
+                              ' ' +
+                              _controllerSecondName.text;
+                          driverModelEdit!.fIRSTNAMED =
+                              _controllerFirstName.text;
+                          driverModelEdit!.sECONDNAMED =
+                              _controllerSecondName.text;
+                          driverModelEdit!.aDDRESSD = _controllerAddress.text;
+                          driverModelEdit!.cHANGERIDD =
+                              int.tryParse(widget.user.id!);
                           await providerDriver.editDriver(
                               StaticData.urlDriverEdit, driverModelEdit!);
                           _controllerFirstName.clear();
                           _controllerSecondName.clear();
                           _controllerAddress.clear();
-                          Text message =
-                              Text(getLanguage(context, 'messageEditSuccess'));
+                          Text message = Text(
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Color.fromARGB(255, 31, 124, 19)),
+                            getLanguage(context, 'messageEditSuccess'),
+                          );
+                          providerDriver.changeMessage(message);
+                        } else {
+                          Text message = Text(
+                              getLanguage(context, 'messageEditFaildDriver'));
                           providerDriver.changeMessage(message);
                         }
                       }

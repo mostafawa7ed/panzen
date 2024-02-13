@@ -14,6 +14,7 @@ class ProviderProvider extends ChangeNotifier {
     Map<String, dynamic> mymap = {
       "name": provider.nAME,
       "address": provider.aDDRESS,
+      "taxNumber": provider.tAXNUMBER,
       //    "amountPerTon": provider.aMMOUNTPERTON,
       "changerId": provider.cHANGERID,
     };
@@ -31,6 +32,11 @@ class ProviderProvider extends ChangeNotifier {
       print('Error fetching data: $e');
       // Return an empty list in case of an error
     }
+  }
+
+  Future<void> getSearchedProviderMakeEmpty() async {
+    searchedList = [];
+    notifyListeners();
   }
 
   Future<void> getSearchedProviderData(String url) async {
@@ -89,6 +95,7 @@ class ProviderProvider extends ChangeNotifier {
     Map<String, dynamic> mymap = {
       "name": provider.nAME,
       "address": provider.aDDRESS,
+      "taxNumber": provider.tAXNUMBER,
       //  "amountPerTon": provider.aMMOUNTPERTON,
       "changerId": provider.cHANGERID,
     };

@@ -80,4 +80,30 @@ class Crud {
       return myMap;
     }
   }
+
+  Future<Map<String, dynamic>> deleteRequest(String url) async {
+    Map<String, dynamic> myMap = {};
+
+    try {
+      final Response response = await http.delete(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body.toString());
+        myMap = data;
+        print('Data deleted successfully');
+        return myMap;
+      } else {
+        print('Failed to delete data');
+        return myMap;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return myMap;
+    }
+  }
 }

@@ -10,7 +10,9 @@ import 'package:untitled4/page/signup.dart';
 import 'package:untitled4/page/tansportationfee.dart';
 import 'package:untitled4/page/transportationFeeDataTable.dart';
 
+import '../controller/provider_timer.dart';
 import '../data/langaue.dart';
+import 'changePassword.dart';
 import 'driver.dart';
 import 'provider.dart';
 import 'reportPage.dart';
@@ -32,64 +34,31 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   int indexPage = 0;
-  late Timer _timer;
-  int _seconds = 60 * 60 * 2;
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void startTimer() {
-    const oneSec = const Duration(seconds: 1);
-    _timer = Timer.periodic(
-      oneSec,
-      (Timer timer) {
-        if (_seconds == 0) {
-          setState(() {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => LoginPage(
-                        Language: widget.language,
-                      )),
-            );
-            timer.cancel();
-          });
-        } else {
-          setState(() {
-            _seconds--;
-          });
-        }
-      },
-    );
-  }
 
   @override
   void initState() {
-    Timer.periodic(const Duration(hours: 2), (timer) {
-      print(DateTime.now());
-    });
-    startTimer();
+    final ProviderTimer providerTimer =
+        Provider.of<ProviderTimer>(listen: false, context);
+    providerTimer.resetTimer(context, widget.language);
     super.initState();
-  }
-
-  String getTimerText() {
-    int hours = (_seconds ~/ 3600);
-    int minutes = (_seconds % 3600) ~/ 60;
-    int seconds = _seconds % 60;
-
-    String hoursStr = (hours < 10) ? '0$hours' : '$hours';
-    String minutesStr = (minutes < 10) ? '0$minutes' : '$minutes';
-    String secondsStr = (seconds < 10) ? '0$seconds' : '$seconds';
-
-    return '$hoursStr:$minutesStr:$secondsStr            ';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LoginPage(
+                          Language: widget.language,
+                        )),
+              );
+            },
+            icon: Icon(Icons.logout),
+          ),
           actions: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -116,9 +85,15 @@ class _MyHomePageState extends State<HomePage> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(
-                getTimerText(),
-                style: const TextStyle(fontSize: 16.0),
+              child: Selector<ProviderTimer, String>(
+                selector: (context, providerTimer) => providerTimer.time,
+                builder: (context, timer, child) {
+                  return Text(timer);
+                },
+
+                // child: Consumer<ProviderTimer>(
+                //   builder: (context, providerTimer, _) =>
+                //       Text(providerTimer.time),
               ),
             ),
           ],
@@ -335,6 +310,35 @@ class _MyHomePageState extends State<HomePage> {
                             child: Text(getLanguage(context, 'Formreport'))),
                       ),
                     ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            style: indexPage == 6
+                                ? ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange[300],
+                                    elevation: 5,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )
+                                : null,
+                            onPressed: () {
+                              setState(() {
+                                indexPage = 6;
+                              });
+                              widget.controller.animateToPage(
+                                6,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              );
+                            },
+                            child:
+                                Text(getLanguage(context, 'changePassword'))),
+                      ),
+                    ),
                   ],
                 ),
                 CustomPageView(
@@ -377,6 +381,7 @@ class CustomPageView extends StatelessWidget {
           TransportationFee(user: user, language: language),
           const ReportTap(),
           TransportationFeeDataTable(user: user, language: language),
+          ChangePassword(user: user, Language: language),
         ],
       ),
     );

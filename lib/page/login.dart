@@ -175,15 +175,15 @@ class _LoginPageState extends State<LoginPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: <Widget>[
-                                ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _showChangePassword = true;
-                                    });
-                                  },
-                                  child: Text(
-                                      getLanguage(context, 'changePassword')),
-                                ),
+                                // ElevatedButton(
+                                //   onPressed: () {
+                                //     setState(() {
+                                //       _showChangePassword = true;
+                                //     });
+                                //   },
+                                //   child: Text(
+                                //       getLanguage(context, 'changePassword')),
+                                // ),
                                 const SizedBox(height: 20),
                                 if (_showChangePassword) ...[
                                   TextFormField(

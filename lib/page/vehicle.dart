@@ -59,11 +59,16 @@ class _VehicleTabState extends State<VehicleTab> {
                 children: [
                   Consumer<ProviderVehicle>(
                       builder: (context, providerVehicle, child) {
-                    return IconButton(
+                    return ElevatedButton(
                         onPressed: () {
-                          addEdit = 2;
+                          setState(() {
+                            addEdit = 2;
+                          });
+                          _controllerName.clear();
+                          _controllerPlateNo.clear();
+                          _controllerSearched.clear();
                         },
-                        icon: Icon(Icons.edit));
+                        child: Text(getLanguage(context, 'searchAndEdit')));
                   }),
                   Consumer<ProviderVehicle>(
                       builder: (context, providerVehicle, child) {
@@ -185,8 +190,14 @@ class _VehicleTabState extends State<VehicleTab> {
                             StaticData.urlAddVehicle, vehicle);
                         _controllerName.clear();
                         _controllerPlateNo.clear();
-                        Text message =
-                            Text(getLanguage(context, 'messageSuccess'));
+
+                        Text message = Text(
+                          getLanguage(context, 'messageSuccess'),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Color.fromARGB(255, 31, 124, 19)),
+                        );
                         providerVehicle.changeMessage(message);
                       }
                     },
@@ -209,18 +220,19 @@ class _VehicleTabState extends State<VehicleTab> {
                     return Row(
                       children: [
                         Expanded(
-                          flex: 10,
-                          child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  addEdit = 1;
-                                });
-                              },
-                              icon: Icon(Icons.add)),
-                        ),
-                        Expanded(
-                            flex: 10, child: Text(getLanguage(context, 'add'))),
-                        Expanded(flex: 40, child: SizedBox()),
+                            flex: 10,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    addEdit = 1;
+                                  });
+
+                                  _controllerName.clear();
+                                  _controllerPlateNo.clear();
+                                  _controllerSearched.clear();
+                                },
+                                child: Text(getLanguage(context, 'add')))),
+                        Expanded(flex: 50, child: SizedBox()),
                       ],
                     );
                   }),
@@ -244,8 +256,15 @@ class _VehicleTabState extends State<VehicleTab> {
                                 )
                                 .toList(),
                             onChanged: (VehicleMap? value) => setState(
-                              () {
+                              () async {
                                 if (value != null) selectedColumn = value;
+                                String url = StaticData.urlVehicleSearch +
+                                    '?column=NAME&value= ';
+                                final ProviderVehicle providerVehicle =
+                                    Provider.of<ProviderVehicle>(context,
+                                        listen: false);
+                                await providerVehicle
+                                    .getSearchedVehicleData(url);
                               },
                             ),
                           ),
@@ -278,7 +297,26 @@ class _VehicleTabState extends State<VehicleTab> {
                             ),
                           ),
                         ),
-                        Expanded(flex: 8, child: SizedBox()),
+                        ElevatedButton(
+                            onPressed: () async {
+                              String url = StaticData.urlVehicleSearch +
+                                  '?column=NAME&value= ';
+                              final ProviderVehicle providerVehicle =
+                                  Provider.of<ProviderVehicle>(context,
+                                      listen: false);
+                              await providerVehicle.getSearchedVehicleData(url);
+                            },
+                            child: Text(getLanguage(context, 'search'))),
+                        ElevatedButton(
+                            onPressed: () async {
+                              final ProviderVehicle providerVehicle =
+                                  Provider.of<ProviderVehicle>(context,
+                                      listen: false);
+                              await providerVehicle
+                                  .getSearchedVehicleMakeEmpty();
+                            },
+                            child: Text(getLanguage(context, 'dismissSearch'))),
+                        Expanded(child: SizedBox()),
                       ],
                     ),
                   ),
@@ -423,7 +461,7 @@ class _VehicleTabState extends State<VehicleTab> {
                       items: vehicleTypes.map((VehicleType type) {
                         return DropdownMenuItem<int>(
                           value: type.id,
-                          child: Text(type.name),
+                          child: Text(getLanguage(context, type.name)),
                         );
                       }).toList(),
                       onChanged: (int? value) {
@@ -449,18 +487,23 @@ class _VehicleTabState extends State<VehicleTab> {
                         final ProviderVehicle providerVehicle =
                             Provider.of<ProviderVehicle>(context,
                                 listen: false);
-                        editedvehicle!.nAME = _controllerName.text;
-                        editedvehicle!.pLATENO = _controllerPlateNo.text;
-                        editedvehicle!.vEHICLETYPEID = vehicletype;
-                        editedvehicle!.cHANGERID =
-                            int.tryParse(widget.user.id!);
+
                         if (editedvehicle != null) {
+                          editedvehicle!.nAME = _controllerName.text;
+                          editedvehicle!.pLATENO = _controllerPlateNo.text;
+                          editedvehicle!.vEHICLETYPEID = vehicletype;
+                          editedvehicle!.cHANGERID =
+                              int.tryParse(widget.user.id!);
                           await providerVehicle.editVehicle(
                               StaticData.urlVehicleEdit, editedvehicle!);
                           _controllerName.clear();
                           _controllerPlateNo.clear();
                           Text message =
                               Text(getLanguage(context, 'messageEditSuccess'));
+                          providerVehicle.changeMessage(message);
+                        } else {
+                          Text message = Text(
+                              getLanguage(context, 'messageEditFaildvehicle'));
                           providerVehicle.changeMessage(message);
                         }
                       }

@@ -1,10 +1,13 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../api/CRUD.dart';
 import '../controller/provider_report.dart';
 import '../data/langaue.dart';
 import '../data/staticdata.dart';
+import '../functions/mediaquery.dart';
 import '../model/transportationfeeReportMode.dart';
 import '../model/user_model.dart';
 
@@ -31,7 +34,7 @@ class _TransportationFeeDataTableState
         Provider.of<ProviderReportData>(context, listen: false);
     await providerReportData.transportaionfeeList(
         StaticData.urlTransportationDatapagination,
-        {'from': 1, 'to': 10, 'limit': 10});
+        {'name': '', 'from': 1, 'to': 10, 'limit': 10});
   }
 
   @override
@@ -49,6 +52,8 @@ class _TransportationFeeDataTableState
     // You can add more styles as needed
   );
   final ScrollController _scrollController = ScrollController();
+  TextEditingController _controllerSearch = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
@@ -61,6 +66,43 @@ class _TransportationFeeDataTableState
         controller: _scrollController,
         child: Column(
           children: [
+            Container(
+              width: getSizePage(context, 1, 60),
+              child: TextField(
+                controller: _controllerSearch,
+                decoration: InputDecoration(
+                  labelText: getLanguage(context, 'searchByProvider'),
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                  suffix: Icon(
+                    size: 30,
+                    Icons.search,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                ),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+                onChanged: (value) async {
+                  final ProviderReportData providerReportData =
+                      Provider.of<ProviderReportData>(context, listen: false);
+                  await providerReportData.transportaionfeeList(
+                    StaticData.urlTransportationDatapagination,
+                    {'name': value, 'from': 1, 'to': 10, 'limit': 10},
+                  );
+                  providerReportData.currentStart = 1;
+                  providerReportData.currentEnd = 10;
+                },
+              ),
+            ),
             Card(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 0.8),
@@ -82,16 +124,22 @@ class _TransportationFeeDataTableState
                           style: customTextStyle, getLanguage(context, 'type')),
                     ),
                     Expanded(
-                      flex: 3,
+                      flex: 2,
                       child: Text(
                           style: customTextStyle,
-                          getLanguage(context, 'providerSender')),
+                          getLanguage(context, 'fromTo')),
                     ),
                     Expanded(
                       flex: 3,
                       child: Text(
                           style: customTextStyle,
-                          getLanguage(context, 'providerReceiver')),
+                          getLanguage(context, 'sender')),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                          style: customTextStyle,
+                          getLanguage(context, 'receiver')),
                     ),
                     Expanded(
                       flex: 3,
@@ -133,13 +181,13 @@ class _TransportationFeeDataTableState
                       flex: 3,
                       child: Text(
                           style: customTextStyle,
-                          getLanguage(context, 'amount')),
+                          getLanguage(context, 'priceTon')),
                     ),
-                    // Expanded(
-                    //     flex: 3,
-                    //     child: Text(
-                    //         style: customTextStyle,
-                    //         getLanguage(context, 'providerDeDateEnd'))),
+                    Expanded(
+                        flex: 3,
+                        child: Text(
+                            style: customTextStyle,
+                            getLanguage(context, 'delete'))),
                   ],
                 ),
               ),
@@ -166,24 +214,23 @@ class _TransportationFeeDataTableState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                      onPressed: providerReportData.currentPage !=
-                              providerReportData.totalPages
+                      onPressed: (providerReportData.currentStart + 10 <=
+                              providerReportData.totalCount)
                           ? () async {
-                              int start = 0;
-                              int end = 0;
-                              start = providerReportData.totalCount % 10;
-                              if (start == 0) {
-                                start = providerReportData.totalCount - 10 + 1;
-                              } else {
-                                start =
-                                    (providerReportData.totalPages - 1) * 10 +
-                                        providerReportData.totalCount % 10 +
-                                        1;
-                              }
-                              end = start + 9;
+                              int start = (((providerReportData.totalCount / 10)
+                                          .floor()) *
+                                      10 +
+                                  1);
+                              int end = (((providerReportData.totalCount / 10)
+                                          .floor()) *
+                                      10 +
+                                  10);
 
+                              providerReportData.currentStart = start;
+                              providerReportData.currentEnd = end;
                               await providerReportData.transportaionfeeList(
                                   StaticData.urlTransportationDatapagination, {
+                                'name': _controllerSearch.text,
                                 'from': start, //'$start',
                                 'to': end //'$end',
                               });
@@ -193,15 +240,14 @@ class _TransportationFeeDataTableState
                           : null,
                       icon: const Icon(Icons.keyboard_double_arrow_right)),
                   IconButton(
-                      onPressed: providerReportData.currentPage !=
-                              providerReportData.totalPages
+                      onPressed: providerReportData.currentStart + 10 <=
+                              providerReportData.totalCount
                           ? () async {
-                              int start =
-                                  providerReportData.currentPage * 10 + 1;
-                              int end = start + 9;
-
+                              int start = providerReportData.currentStart + 10;
+                              int end = providerReportData.currentEnd + 10;
                               await providerReportData.transportaionfeeList(
                                   StaticData.urlTransportationDatapagination, {
+                                'name': _controllerSearch.text,
                                 'from': start, //'$start',
                                 'to': end //'$end',
                               });
@@ -212,16 +258,19 @@ class _TransportationFeeDataTableState
                       icon: const Icon(Icons.arrow_back)),
                   TextButton(
                       onPressed: () {},
-                      child: Text(providerReportData.currentPage.toString())),
+                      child: Text((providerReportData.currentStart / 10)
+                          .ceil()
+                          .toString())),
                   IconButton(
-                      onPressed: providerReportData.currentPage != 1
+                      onPressed: providerReportData.currentStart != 1
                           ? () async {
-                              int start = 0;
-                              int end = 0;
-                              start = providerReportData.totalPages * 10 - 10;
-                              end = start + 9;
+                              int start = providerReportData.currentStart - 10;
+                              int end = providerReportData.currentEnd - 10;
+                              providerReportData.currentStart = start;
+                              providerReportData.currentStart = end;
                               await providerReportData.transportaionfeeList(
                                   StaticData.urlTransportationDatapagination, {
+                                'name': _controllerSearch.text,
                                 'from': start, //'$start',
                                 'to': end //'$end',
                               });
@@ -231,14 +280,15 @@ class _TransportationFeeDataTableState
                           : null,
                       icon: const Icon(Icons.arrow_forward)),
                   IconButton(
-                      onPressed: providerReportData.currentPage != 1
+                      onPressed: providerReportData.currentStart != 1
                           ? () async {
-                              int start = 0;
-                              int end = 0;
-                              start = 1;
-                              end = start + 9;
+                              int start = 1;
+                              int end = 10;
+                              providerReportData.currentStart = start;
+                              providerReportData.currentEnd = end;
                               await providerReportData.transportaionfeeList(
                                   StaticData.urlTransportationDatapagination, {
+                                'name': _controllerSearch.text,
                                 'from': start, //'$start',
                                 'to': end //'$end',
                               });
@@ -258,11 +308,18 @@ class _TransportationFeeDataTableState
 }
 
 // ignore: must_be_immutable
-class CustomRowWidget extends StatelessWidget {
+class CustomRowWidget extends StatefulWidget {
   final TransportaionfeeReport transportaionfeeReport;
   final int currentIndex;
+
   CustomRowWidget(
       {required this.transportaionfeeReport, required this.currentIndex});
+
+  @override
+  _CustomRowWidgetState createState() => _CustomRowWidgetState();
+}
+
+class _CustomRowWidgetState extends State<CustomRowWidget> {
   final TextStyle customTextStyle = const TextStyle(
     color: Color.fromARGB(255, 0, 0, 0),
     fontSize: 16.0,
@@ -275,18 +332,18 @@ class CustomRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String? endDate;
-    String? startDate = getDateCasting(
-        DateTime.parse(transportaionfeeReport.providerDetailsStartDate!));
-    if (transportaionfeeReport.providerDetailsEndDate != null) {
-      endDate = getDateCasting(
-          DateTime.parse(transportaionfeeReport.providerDetailsEndDate!));
+    String? startDate = getDateCasting(DateTime.parse(
+        widget.transportaionfeeReport.providerDetailsStartDate!));
+    if (widget.transportaionfeeReport.providerDetailsEndDate != null) {
+      endDate = getDateCasting(DateTime.parse(
+          widget.transportaionfeeReport.providerDetailsEndDate!));
     } else {
       endDate = "";
     }
     String? daterequest;
-    if (transportaionfeeReport.requestDate != null) {
-      daterequest =
-          getDateCasting(DateTime.parse(transportaionfeeReport.requestDate!));
+    if (widget.transportaionfeeReport.requestDate != null) {
+      daterequest = getDateCasting(
+          DateTime.parse(widget.transportaionfeeReport.requestDate!));
     } else {
       daterequest = "";
     }
@@ -299,43 +356,54 @@ class CustomRowWidget extends StatelessWidget {
             children: [
               Expanded(
                 flex: 1,
-                child: Text(style: customTextStyle, currentIndex.toString()),
+                child: Text(
+                    style: customTextStyle, widget.currentIndex.toString()),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.transportationFeeId.toString()),
+                    widget.transportaionfeeReport.transportationFeeId
+                        .toString()),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.type.toString()),
+                    widget.transportaionfeeReport.type.toString()),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                    style: customTextStyle,
+                    widget.transportaionfeeReport.fromCity.toString() +
+                        ' / ' +
+                        widget.transportaionfeeReport.toCity.toString()),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.providerName.toString()),
+                    widget.transportaionfeeReport.providerName.toString()),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.providerReceiverName.toString()),
+                    widget.transportaionfeeReport.providerReceiverName
+                        .toString()),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.driverName.toString()),
+                    widget.transportaionfeeReport.driverName.toString()),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.numberOfTon.toString()),
+                    widget.transportaionfeeReport.numberOfTon.toString()),
               ),
               // Expanded(
               //   flex: 3,
@@ -353,22 +421,51 @@ class CustomRowWidget extends StatelessWidget {
                 flex: 3,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.totalValue.toString()),
+                    widget.transportaionfeeReport.totalValue.toString()),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
                     style: customTextStyle,
-                    transportaionfeeReport.providerDetailsAmountPerTon
+                    widget.transportaionfeeReport.providerDetailsAmountPerTon
                         .toString()),
               ),
-              // Expanded(
-              //   flex: 3,
-              //   child: ElevatedButton(
-              //     onPressed: () {},
-              //     child: const Text("Action"),
-              //   ),
-              // ),
+              Expanded(
+                flex: 3,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    AwesomeDialog(
+                      context: context,
+                      dialogType: DialogType.warning,
+                      headerAnimationLoop: false,
+                      animType: AnimType.scale,
+                      title: getLanguage(context, 'deleteAlter'),
+                      desc: getLanguage(context, 'messageDelete'),
+                      btnOkText: getLanguage(context, 'delete'),
+                      btnOkOnPress: () async {
+                        Crud crud = Crud();
+                        String url = StaticData.urlTransportationFeeDelete +
+                            "${widget.transportaionfeeReport.transportationFeeId}";
+                        await crud.deleteRequest(url).then((response) async {
+                          final ProviderReportData providerReportData =
+                              Provider.of<ProviderReportData>(context,
+                                  listen: false);
+                          await providerReportData.transportaionfeeList(
+                              StaticData.urlTransportationDatapagination,
+                              {'name': '', 'from': 1, 'to': 10, 'limit': 10});
+                          providerReportData.currentStart = 1;
+                          providerReportData.currentEnd = 10;
+                          print(response);
+                        });
+                      },
+                      btnCancelOnPress: () {},
+                      btnCancelText: getLanguage(context, 'cancel'),
+                      btnOkIcon: Icons.check_circle,
+                    ).show();
+                  },
+                  child: Text(getLanguage(context, 'delete')),
+                ),
+              ),
             ],
           ),
         ),

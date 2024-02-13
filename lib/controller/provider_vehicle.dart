@@ -59,6 +59,11 @@ class ProviderVehicle extends ChangeNotifier {
     }
   }
 
+  Future<void> getSearchedVehicleMakeEmpty() async {
+    searchedList = [];
+    notifyListeners();
+  }
+
   Future<void> getSearchedVehicleData(String url) async {
     try {
       // Make an HTTP GET request to the provided URL

@@ -9,6 +9,8 @@ class ProviderReportData extends ChangeNotifier {
   int totalPages = 0;
   int currentPage = 0;
   int totalCount = 0;
+  int currentStart = 1;
+  int currentEnd = 10;
   final Crud _crud = Crud();
 
   Future<void> transportaionfeeReportPrepareList(
@@ -41,7 +43,8 @@ class ProviderReportData extends ChangeNotifier {
     }
   }
 
-  Future<void> transportaionfeeList(String url, Map<String, int> map) async {
+  Future<void> transportaionfeeList(
+      String url, Map<String, dynamic> map) async {
     try {
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, map);
 

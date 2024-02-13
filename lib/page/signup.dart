@@ -122,7 +122,7 @@ class _SignUpPageState extends State<SignUp> {
                         SizedBox(height: 20),
                         CustomSignUpTextFaild(
                             controller: firstNameController,
-                            nameLabel: getLanguage(context, 'firstName'),
+                            nameLabel: getLanguage(context, 'name'),
                             validator: validator,
                             onSaved: onSaved),
                         SizedBox(height: 20),
@@ -132,13 +132,13 @@ class _SignUpPageState extends State<SignUp> {
                             validator: validator,
                             onSaved: onSaved),
                         SizedBox(height: 20),
-                        CustomSignUpTextFaild(
-                            controller: addressController,
-                            nameLabel: getLanguage(context, 'address'),
-                            validator: validator,
-                            onSaved: onSaved),
-                        SizedBox(height: 20),
-                        SizedBox(height: 20),
+                        // CustomSignUpTextFaild(
+                        //     controller: addressController,
+                        //     nameLabel: getLanguage(context, 'address'),
+                        //     validator: validator,
+                        //     onSaved: onSaved),
+                        // SizedBox(height: 20),
+                        //SizedBox(height: 20),
                         TextFormField(
                             controller: passwordController,
                             decoration: InputDecoration(
@@ -183,8 +183,6 @@ class _SignUpPageState extends State<SignUp> {
                                             "" &&
                                         userNameController.text.toString() !=
                                             "" &&
-                                        addressController.text.toString() !=
-                                            "" &&
                                         passwordController.text.toString() !=
                                             "") {
                                       User user = User();
@@ -197,8 +195,7 @@ class _SignUpPageState extends State<SignUp> {
                                       user.name = user.firstName! +
                                           " " +
                                           user.secondName!;
-                                      user.address =
-                                          addressController.text.toString();
+                                      user.address = "عنوان";
                                       user.password =
                                           passwordController.text.toString();
 

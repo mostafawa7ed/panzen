@@ -16,6 +16,8 @@ class TransportaionfeeReport {
   String? requestDate;
   String? timeStamp;
   String? type;
+  String? fromCity;
+  String? toCity;
 
   TransportaionfeeReport(
       {this.transportationFeeId,
@@ -34,7 +36,9 @@ class TransportaionfeeReport {
       this.numberOfTon,
       this.requestDate,
       this.timeStamp,
-      this.type});
+      this.type,
+      this.fromCity,
+      this.toCity});
 
   TransportaionfeeReport.fromJson(Map<String, dynamic> json) {
     transportationFeeId = json['transportation_fee_id'];
@@ -54,6 +58,8 @@ class TransportaionfeeReport {
     requestDate = json['request_date'];
     timeStamp = json['time_stamp'];
     type = json['type'];
+    fromCity = json['provider_details_from_city'];
+    toCity = json['provider_details_to_city'];
   }
 
   Map<String, dynamic> toJson() {
@@ -75,6 +81,8 @@ class TransportaionfeeReport {
     data['request_date'] = this.requestDate;
     data['time_stamp'] = this.timeStamp;
     data['type'] = this.type;
+    data['provider_details_from_city'] = this.fromCity;
+    data['provider_details_to_city'] = this.toCity;
     return data;
   }
 }

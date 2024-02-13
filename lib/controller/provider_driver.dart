@@ -33,6 +33,11 @@ class ProviderDriver extends ChangeNotifier {
     }
   }
 
+  Future<void> getSearchedDriverMakeEmpty() async {
+    searchedList = [];
+    notifyListeners();
+  }
+
   Future<void> getSearchedDriverData(String url) async {
     try {
       // Make an HTTP GET request to the provided URL

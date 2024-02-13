@@ -20,6 +20,8 @@ import '../controller/provider_provider.dart';
 import '../controller/provider_providerDetails.dart';
 import '../controller/provider_vehicle.dart';
 import '../data/langaue.dart';
+import '../model/type_model.dart';
+import 'driver.dart';
 
 class TransportationFee extends StatefulWidget {
   const TransportationFee(
@@ -38,7 +40,6 @@ class _TransportationFeeState extends State<TransportationFee> {
   TextEditingController _providerReciverController = TextEditingController();
   TextEditingController _providerDetailsController = TextEditingController();
   TextEditingController _driverController = TextEditingController();
-  TextEditingController _type = TextEditingController();
 
   Vehicle selectedVehicle = Vehicle();
   ProviderModel selectedProviderMOdel = ProviderModel();
@@ -72,39 +73,24 @@ class _TransportationFeeState extends State<TransportationFee> {
   DriverMap? selectedDriverColumn;
   List<DriverMap> driverColumnsItems = [
     DriverMap("Name", "NAME"),
-    DriverMap("Address", "ADDRESS"),
+    DriverMap("license", "ADDRESS"),
   ];
   String SelectedColumn = 'Item 1';
   String type = '';
-  // Future<void> prepareData(BuildContext context) async {
-  //   final ProviderTransportationFee providerTransportationFee =
-  //       Provider.of<ProviderTransportationFee>(context, listen: false);
-  //   await providerTransportationFee
-  //       .vehiclePrepareList(StaticData.urlGetAllVehicle);
-  //   await providerTransportationFee
-  //       .providerPrepareList(StaticData.urlGetAllProviders);
-  //   await providerTransportationFee
-  //       .driverPrepareList(StaticData.urlGetAllDriver);
-
-  //   // await providerTransportationFee.addTransporationFee(
-  //   //               StaticData.urltransportationFeeAdd, transportationFeeModel);
-  // }
-
-  // @override
-  // void dispose() {
-  //   _vehicleController.dispose();
-  //   _providerController.dispose();
-  //   _providerDetailsController.dispose();
-  //   _driverController.dispose();
-  //   _vehicleFieldFocus.dispose();
-  //   _providerFieldFocus.dispose();
-  //   _vehicleFieldFocus.dispose();
-  //   _providerDetailsFieldFocus.dispose();
-  //   _driverFieldFocus.dispose();
-
-  //   super.dispose();
-  // }
-
+  List<VehicleType> vehicleTypes = [
+    VehicleType(1, 'vehiclee'),
+    VehicleType(2, 'trailer'),
+    // Add more VehicleType objects as needed
+  ];
+  List<TypeModel> types = [
+    TypeModel(id: '1', name: 'Diesel'),
+    TypeModel(id: '2', name: 'Solar'),
+    TypeModel(id: '3', name: 'Gasoline 80'),
+    TypeModel(id: '4', name: 'Gasoline 90'),
+    TypeModel(id: '5', name: 'Gasoline 92'),
+    TypeModel(id: '6', name: 'Gasoline 95'),
+  ];
+  TypeModel? _selectedType;
   @override
   void initState() {
     //   prepareData(context);
@@ -222,7 +208,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                                       },
                                       child: ListTile(
                                         title: Text(
-                                            "${option.nAME ?? ''}  ${option.nUMBEROFTRANSACTIONS ?? ''} ${option.cHANGERID ?? ''} "),
+                                            "${getLanguage(context, 'name')}:${option.nAME ?? ''} ${getLanguage(context, 'PlateNum')}: ${option.pLATENO ?? ''} ${getLanguage(context, 'type')}: ${option.vEHICLETYPEID == 1 ? getLanguage(context, 'vehiclee') : getLanguage(context, 'trailer')} "),
                                       ),
                                     );
                                   },
@@ -270,7 +256,8 @@ class _TransportationFeeState extends State<TransportationFee> {
                   width: getSizePage(context, 1, 60),
                   child: Autocomplete<ProviderModel>(
                     optionsBuilder: (TextEditingValue textEditingValue) async {
-                      if (textEditingValue.text.isEmpty) {
+                      if (textEditingValue.text.isEmpty ||
+                          selectedProviderMapColumn == null) {
                         return const Iterable<ProviderModel>.empty();
                       } else {
                         // Replace 'otherModelList' with your list of OtherModel objects
@@ -323,6 +310,32 @@ class _TransportationFeeState extends State<TransportationFee> {
                     optionsViewBuilder: (BuildContext context,
                         AutocompleteOnSelected<ProviderModel> onSelected,
                         Iterable<ProviderModel> options) {
+                      // ListTile(
+                      //           title: Text(getLanguage(context, 'provider') +
+                      //               ": " +
+                      //               "${option.nAME ?? ''}${getLanguage(context, 'address')}: ${option.aDDRESS ?? ''} ${getLanguage(context, 'taxNumber')}: ${option.tAXNUMBER ?? ''} "),
+                      //         ),
+                      // return SingleChildScrollView(
+                      //   physics: BouncingScrollPhysics(),
+                      //   child: ListView.builder(
+                      //     shrinkWrap: true,
+                      //     itemCount: options.length,
+                      //     itemBuilder: (BuildContext context, int index) {
+                      //       final ProviderModel option =
+                      //           options.elementAt(index);
+                      //       return GestureDetector(
+                      //         onTap: () {
+                      //           onSelected(option);
+                      //         },
+                      //         child: ListTile(
+                      //           title: Text(getLanguage(context, 'provider') +
+                      //               ": " +
+                      //               "${option.nAME ?? ''}${getLanguage(context, 'address')}: ${option.aDDRESS ?? ''} ${getLanguage(context, 'taxNumber')}: ${option.tAXNUMBER ?? ''} "),
+                      //         ),
+                      //       );
+                      //     },
+                      //   ),
+                      // );
                       return Align(
                         alignment: Alignment.topLeft,
                         child: Material(
@@ -345,8 +358,10 @@ class _TransportationFeeState extends State<TransportationFee> {
                                         onSelected(option);
                                       },
                                       child: ListTile(
-                                        title: Text(
-                                            "${option.nAME ?? ''}   ${option.aDDRESS ?? ''} "),
+                                        title: Text(getLanguage(
+                                                context, 'provider') +
+                                            ": " +
+                                            "${option.nAME ?? ''}${getLanguage(context, 'address')}: ${option.aDDRESS ?? ''} ${getLanguage(context, 'taxNumber')}: ${option.tAXNUMBER ?? ''} "),
                                       ),
                                     );
                                   },
@@ -363,95 +378,131 @@ class _TransportationFeeState extends State<TransportationFee> {
             ],
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
-          Consumer<ProviderProviderDetails>(
-              builder: (context, providerProviderDetails, child) {
-            return Container(
-              width: getSizePage(context, 1, 60),
-              child: Autocomplete<ProviderDetails>(
-                optionsBuilder: (TextEditingValue textEditingValue) async {
-                  if (textEditingValue.text.isEmpty) {
-                    return const Iterable<ProviderDetails>.empty();
-                  } else {
-                    // Replace 'otherModelList' with your list of OtherModel objects
-                    List<ProviderDetails> matches = await providerProviderDetails
-                        .getSearchedProviderDetailsDataCustom(StaticData
-                                .urlProviderDetailsSearch +
-                            '?column=START_DATE&value=${textEditingValue.text}&providerId=${selectedProviderMOdel.iD}');
-
-                    return matches;
-                  }
-                },
-                onSelected: (ProviderDetails selection) {
-                  selectedProviderDetails = selection;
-
-                  // Update the text in the TextFormField when a vehicle is selected
-                  _providerDetailsController.text = selection.sTARTDATE ?? '';
-                  print('You just selected ${selectedVehicle.nAME}');
-                  FocusScope.of(context)
-                      .requestFocus(_providerDetailsReciverFieldFocus);
-                },
-                fieldViewBuilder: (BuildContext context,
-                    TextEditingController textEditingController,
-                    FocusNode focusNode,
-                    VoidCallback onFieldSubmitted) {
-                  _providerDetailsController = textEditingController;
-                  _providerDetailsFieldFocus =
-                      focusNode; // Store the controller
-                  return TextFormField(
-                    controller: textEditingController,
-                    focusNode: focusNode,
-                    onChanged: (String value) {
-                      // Additional actions while the text changes, if needed
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: DropdownButton(
+                  dropdownColor: Colors.white,
+                  hint: Text(getLanguage(context, 'filter')),
+                  value: _selectedType,
+                  items: types
+                      .map<DropdownMenuItem<TypeModel>>(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(getLanguage(context, e.name!)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (TypeModel? value) => setState(
+                    () {
+                      if (value != null) _selectedType = value;
                     },
-                    onFieldSubmitted: (String value) {
-                      // Handle the submitted value, if needed
+                  ),
+                ),
+              ),
+              Consumer<ProviderProviderDetails>(
+                  builder: (context, providerProviderDetails, child) {
+                return Container(
+                  width: getSizePage(context, 1, 60),
+                  child: Autocomplete<ProviderDetails>(
+                    optionsBuilder: (TextEditingValue textEditingValue) async {
+                      if (textEditingValue.text.isEmpty ||
+                          _selectedType == null) {
+                        return const Iterable<ProviderDetails>.empty();
+                      } else {
+                        // Replace 'otherModelList' with your list of OtherModel objects
+
+                        List<ProviderDetails> matches =
+                            await providerProviderDetails
+                                .getSearchedProviderDetailsDataCustom(StaticData
+                                        .urlProviderDetailsSearch +
+                                    '?column=START_DATE&value=${textEditingValue.text}&providerId=${selectedProviderMOdel.iD}&type=${getLanguage(context, _selectedType!.name ?? '')}');
+
+                        return matches;
+                      }
                     },
-                    decoration: InputDecoration(
-                      labelText:
-                          getLanguage(context, 'typeToSearchProviderDerails'),
-                      border: OutlineInputBorder(),
-                    ),
-                  );
-                },
-                optionsViewBuilder: (BuildContext context,
-                    AutocompleteOnSelected<ProviderDetails> onSelected,
-                    Iterable<ProviderDetails> options) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Material(
-                      elevation: 6.0,
-                      child: Container(
-                        constraints: BoxConstraints(maxHeight: 200.0),
-                        child: SingleChildScrollView(
-                          physics: AlwaysScrollableScrollPhysics(),
+                    onSelected: (ProviderDetails selection) {
+                      selectedProviderDetails = selection;
+
+                      // Update the text in the TextFormField when a vehicle is selected
+                      _providerDetailsController.text = selection.tYPE! +
+                          ' / ' +
+                          selection.fROMCITY! +
+                          '--' +
+                          selection.tOCITY! +
+                          selection.sTARTDATE!;
+                      print('You just selected ${selectedVehicle.nAME}');
+                      FocusScope.of(context)
+                          .requestFocus(_providerDetailsReciverFieldFocus);
+                    },
+                    fieldViewBuilder: (BuildContext context,
+                        TextEditingController textEditingController,
+                        FocusNode focusNode,
+                        VoidCallback onFieldSubmitted) {
+                      _providerDetailsController = textEditingController;
+                      _providerDetailsFieldFocus =
+                          focusNode; // Store the controller
+                      return TextFormField(
+                        controller: textEditingController,
+                        focusNode: focusNode,
+                        onChanged: (String value) {
+                          // Additional actions while the text changes, if needed
+                        },
+                        onFieldSubmitted: (String value) {
+                          // Handle the submitted value, if needed
+                        },
+                        decoration: InputDecoration(
+                          labelText: getLanguage(
+                              context, 'typeToSearchProviderDerails'),
+                          border: OutlineInputBorder(),
+                        ),
+                      );
+                    },
+                    optionsViewBuilder: (BuildContext context,
+                        AutocompleteOnSelected<ProviderDetails> onSelected,
+                        Iterable<ProviderDetails> options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 6.0,
                           child: Container(
-                            width: getSizePage(context, 1, 60),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: options.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final ProviderDetails option =
-                                    options.elementAt(index);
-                                return GestureDetector(
-                                  onTap: () {
-                                    onSelected(option);
+                            constraints: BoxConstraints(maxHeight: 200.0),
+                            child: SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              child: Container(
+                                width: getSizePage(context, 1, 60),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: options.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final ProviderDetails option =
+                                        options.elementAt(index);
+                                    return GestureDetector(
+                                      onTap: () {
+                                        onSelected(option);
+                                      },
+                                      child: ListTile(
+                                        title: Text(
+                                            "${getLanguage(context, 'type')}: ${option.tYPE ?? ''} ${getLanguage(context, 'costPerTon')}:  ${option.aMMOUNTPERTON ?? ''} ${getLanguage(context, 'date')}:  ${option.sTARTDATE ?? ''} "),
+                                      ),
+                                    );
                                   },
-                                  child: ListTile(
-                                    title: Text(
-                                        "${option.aMMOUNTPERTON ?? ''}  /////  ${option.sTARTDATE ?? ''}  /////   ${option.eNDDATE ?? ''} "),
-                                  ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            );
-          }),
+                      );
+                    },
+                  ),
+                );
+              }),
+            ],
+          ),
           Padding(padding: EdgeInsets.only(top: 20)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -484,7 +535,8 @@ class _TransportationFeeState extends State<TransportationFee> {
                   width: getSizePage(context, 1, 60),
                   child: Autocomplete<ProviderModel>(
                     optionsBuilder: (TextEditingValue textEditingValue) async {
-                      if (textEditingValue.text.isEmpty) {
+                      if (textEditingValue.text.isEmpty ||
+                          selectedProviderMapColumn2 == null) {
                         return const Iterable<ProviderModel>.empty();
                       } else {
                         // Replace 'otherModelList' with your list of OtherModel objects
@@ -551,8 +603,10 @@ class _TransportationFeeState extends State<TransportationFee> {
                                         onSelected(option);
                                       },
                                       child: ListTile(
-                                        title: Text(
-                                            "${option.nAME ?? ''}  ${option.aDDRESS ?? ''} "),
+                                        title: Text(getLanguage(
+                                                context, 'provider') +
+                                            ": " +
+                                            "${option.nAME ?? ''}${getLanguage(context, 'address')}: ${option.aDDRESS ?? ''} ${getLanguage(context, 'taxNumber')}: ${option.tAXNUMBER ?? ''} "),
                                       ),
                                     );
                                   },
@@ -669,7 +723,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                                       },
                                       child: ListTile(
                                         title: Text(
-                                            "${option.nAMED ?? ''} //// ${option.aDDRESSD ?? ''} ///// ${option.aDDRESSD ?? ''} "),
+                                            " ${getLanguage(context, 'name')}: ${option.nAMED ?? ''} ${getLanguage(context, 'license')}: ${option.aDDRESSD ?? ''} "),
                                       ),
                                     );
                                   },
@@ -712,16 +766,6 @@ class _TransportationFeeState extends State<TransportationFee> {
           ),
           Container(
             width: getSizePage(context, 1, 63),
-            child: CustomTextFieldSearch(
-              onChanged: (value) {
-                type = value;
-              },
-              controllerCaseNumber: _type,
-              labelText: getLanguage(context, 'type'),
-            ),
-          ),
-          Container(
-            width: getSizePage(context, 1, 63),
             child: DateTimeFormField(
               style: const TextStyle(
                 color: Colors.black,
@@ -751,6 +795,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                 final ProviderTransportationFee providerTransportationFee =
                     Provider.of<ProviderTransportationFee>(context,
                         listen: false);
+                type = selectedProviderDetails.tYPE!;
                 if (selectedVehicle.iD == null &&
                     numberOfTon.text == "" &&
                     selectedProviderDetails.iD == null &&
@@ -802,6 +847,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                   _providerController.clear();
                   _providerDetailsController.clear();
                   _driverController.clear();
+                  _providerReciverController.clear();
                   selectedVehicle = Vehicle();
                   selectedProviderReciverMOdel = ProviderModel();
                   selectedProviderMOdel = ProviderModel();

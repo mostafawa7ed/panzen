@@ -42,6 +42,9 @@ class StaticData {
 
   static const String urlProviderDetailsSearch =
       "${urlConnectionConst}providerDetails/search";
+
+  static const String urlTransportationFeeDelete =
+      "${urlConnectionConst}transportationFee/delete/";
 //http://localhost:5000/api/transportationFee/add
 ////////////////////////// textDirection /////////////////////
 ////////////////////   Images path  //////////////////////////////////

@@ -17,6 +17,9 @@ class ProviderProviderDetails extends ChangeNotifier {
       "changerId": providerDetails.cHANGERID,
       "amountPerTon": providerDetails.aMMOUNTPERTON,
       "providersId": providerDetails.pROVIDERSID,
+      "fromCity": providerDetails.fROMCITY,
+      "toCity": providerDetails.tOCITY,
+      "type": providerDetails.tYPE
     };
     try {
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, mymap);

@@ -6,15 +6,22 @@ class ProviderDetails {
   double? aMMOUNTPERTON;
   int? cHANGERID;
   String? tIMESTAMP;
+  String? fROMCITY;
+  String? tOCITY;
+  String? tYPE;
 
-  ProviderDetails(
-      {this.iD,
-      this.pROVIDERSID,
-      this.sTARTDATE,
-      this.eNDDATE,
-      this.aMMOUNTPERTON,
-      this.cHANGERID,
-      this.tIMESTAMP});
+  ProviderDetails({
+    this.iD,
+    this.pROVIDERSID,
+    this.sTARTDATE,
+    this.eNDDATE,
+    this.aMMOUNTPERTON,
+    this.cHANGERID,
+    this.tIMESTAMP,
+    this.fROMCITY,
+    this.tOCITY,
+    this.tYPE,
+  });
 
   ProviderDetails.fromJson(Map<String, dynamic> json) {
     iD = int.tryParse(json['ID'].toString());
@@ -31,6 +38,9 @@ class ProviderDetails {
 
     cHANGERID = int.tryParse(json['CHANGER_ID'].toString());
     tIMESTAMP = json['TIME_STAMP'];
+    fROMCITY = json['FROM_CITY'];
+    tOCITY = json['TO_CITY'];
+    tYPE = json['TYPE'];
   }
 
   Map<String, dynamic> toJson() {
@@ -42,6 +52,9 @@ class ProviderDetails {
     data['AMMOUNT_PER_TON'] = this.aMMOUNTPERTON;
     data['CHANGER_ID'] = this.cHANGERID;
     data['TIME_STAMP'] = this.tIMESTAMP;
+    data['FROM_CITY'] = this.fROMCITY;
+    data['TO_CITY'] = this.tOCITY;
+    data['TYPE'] = this.tYPE;
     return data;
   }
 }
