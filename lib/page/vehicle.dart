@@ -1,4 +1,6 @@
+import 'package:date_field/date_field.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled4/model/user_model.dart';
 import 'package:untitled4/model/vehicle_model.dart';
@@ -21,6 +23,7 @@ class _VehicleTabState extends State<VehicleTab> {
   Vehicle selectedVehicle = Vehicle();
   String selected = '';
   VehicleMap? selectedColumn;
+  int flage = 1;
   List<VehicleMap> vehicleColumnsItems = [
     VehicleMap("Name", "NAME"),
     VehicleMap("PlateNum", "PLATE_NO"),
@@ -35,12 +38,15 @@ class _VehicleTabState extends State<VehicleTab> {
   TextEditingController _controllerName = TextEditingController();
   TextEditingController _controllerPlateNo = TextEditingController();
   TextEditingController _controllerSearched = TextEditingController();
+  TextEditingController _controllerDrivierLicence = TextEditingController();
 
   int? _selectedVehicleTypeId;
-  FocusNode _focusNodeName = FocusNode();
-  FocusNode _focusNodePlateNo = FocusNode();
-
+  // FocusNode _focusNodeName = FocusNode();
+  // FocusNode _focusNodePlateNo = FocusNode();
+  final formate = DateFormat('yyyy-MM-dd-HH-mm');
+  DateTime? fromDate;
   int? vehicletype;
+  String? date;
   List<VehicleType> vehicleTypes = [
     VehicleType(1, 'vehiclee'),
     VehicleType(2, 'trailer'),
@@ -81,7 +87,7 @@ class _VehicleTabState extends State<VehicleTab> {
                           EdgeInsets.symmetric(horizontal: 30, vertical: 19),
                       child: TextFormField(
                         controller: _controllerName,
-                        focusNode: _focusNodeName,
+                        //      focusNode: _focusNodeName,
                         decoration: InputDecoration(
                           labelText: getLanguage(context, 'Name'),
                           enabledBorder: OutlineInputBorder(
@@ -113,7 +119,7 @@ class _VehicleTabState extends State<VehicleTab> {
                           EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: TextFormField(
                         controller: _controllerPlateNo,
-                        focusNode: _focusNodePlateNo,
+                        //  focusNode: _focusNodePlateNo,
                         decoration: InputDecoration(
                           labelText: getLanguage(context, 'PlateNum'),
                           enabledBorder: OutlineInputBorder(
@@ -138,6 +144,88 @@ class _VehicleTabState extends State<VehicleTab> {
                       ),
                     ),
                   ),
+                  Container(
+                    width: getSizePage(context, 1, 60),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      child: TextFormField(
+                        controller: _controllerDrivierLicence,
+                        //      focusNode: _focusNodePlateNo,
+                        decoration: InputDecoration(
+                          labelText: getLanguage(context, 'drivierLicence'),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.green),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          // Add your onChanged logic here
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return getLanguage(context, 'fieldsEmpty');
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          // Add your onSaved logic here
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    width: getSizePage(context, 1, 55),
+                    child: DateTimeFormField(
+                      style: const TextStyle(
+                        color: Colors.black,
+                        decorationStyle: TextDecorationStyle.solid,
+                      ),
+                      dateFormat: formate,
+                      decoration: InputDecoration(
+                        labelText: getLanguage(context, 'expirationDate'),
+                      ),
+                      firstDate:
+                          DateTime.now().add(const Duration(days: -222222)),
+                      lastDate:
+                          DateTime.now().add(const Duration(days: 222222)),
+                      initialPickerDateTime:
+                          fromDate != null ? fromDate! : DateTime.now(),
+                      initialDate: fromDate ?? DateTime.now(),
+                      onChanged: (DateTime? value) {
+                        fromDate = value;
+                        //selectedDate = value;
+                      },
+                    ),
+                  ),
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  //   width: getSizePage(context, 1, 55),
+                  //   child: DateTimeFormField(
+                  //     style: const TextStyle(
+                  //       color: Colors.black,
+                  //       decorationStyle: TextDecorationStyle.solid,
+                  //     ),
+                  //     dateFormat: formate,
+                  //     decoration: InputDecoration(
+                  //       labelText: getLanguage(context, 'dateFrom'),
+                  //     ),
+                  //     firstDate:
+                  //         DateTime.now().add(const Duration(days: -222222)),
+                  //     lastDate:
+                  //         DateTime.now().add(const Duration(days: 222222)),
+                  //     initialPickerDateTime:
+                  //         fromDate != null ? fromDate! : DateTime.now(),
+                  //     initialDate: fromDate ?? DateTime.now(),
+                  //     onChanged: (DateTime? value) {
+                  //       fromDate = value;
+                  //       //selectedDate = value;
+                  //     },
+                  //   ),
+                  // ),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     width: getSizePage(context, 1, 55),
@@ -182,14 +270,18 @@ class _VehicleTabState extends State<VehicleTab> {
                             Provider.of<ProviderVehicle>(context,
                                 listen: false);
                         Vehicle vehicle = Vehicle(
-                            vEHICLETYPEID: vehicletype,
-                            pLATENO: _controllerPlateNo.text,
-                            cHANGERID: int.tryParse(widget.user.id!),
-                            nAME: _controllerName.text);
+                          vEHICLETYPEID: vehicletype,
+                          pLATENO: _controllerPlateNo.text,
+                          cHANGERID: int.tryParse(widget.user.id!),
+                          nAME: _controllerName.text,
+                          dRIVIERLICENCE: _controllerDrivierLicence.text,
+                          eXPIRATIONDATE: fromDate.toString(),
+                        );
                         await providerVehicle.addVehicle(
                             StaticData.urlAddVehicle, vehicle);
                         _controllerName.clear();
                         _controllerPlateNo.clear();
+                        _controllerDrivierLicence.clear();
 
                         Text message = Text(
                           getLanguage(context, 'messageSuccess'),
@@ -359,15 +451,32 @@ class _VehicleTabState extends State<VehicleTab> {
                                       Expanded(
                                         child: ElevatedButton(
                                             onPressed: () {
-                                              editedvehicle = providerVehicle
-                                                  .searchedList[index];
-                                              _controllerPlateNo.text =
-                                                  currentObject.pLATENO
-                                                      .toString();
-                                              _controllerName.text =
-                                                  currentObject.nAME!;
-                                              _selectedVehicleTypeId =
-                                                  currentObject.vEHICLETYPEID;
+                                              if (currentObject
+                                                      .eXPIRATIONDATE! !=
+                                                  "") {
+                                                DateTime? dateTime =
+                                                    DateTime.parse(currentObject
+                                                        .eXPIRATIONDATE!);
+                                                editedvehicle = providerVehicle
+                                                    .searchedList[index];
+                                                _controllerPlateNo.text =
+                                                    currentObject.pLATENO
+                                                        .toString();
+                                                _controllerName.text =
+                                                    currentObject.nAME!;
+                                                _selectedVehicleTypeId =
+                                                    currentObject.vEHICLETYPEID;
+                                                _controllerDrivierLicence.text =
+                                                    currentObject
+                                                        .dRIVIERLICENCE!;
+                                                fromDate = dateTime;
+                                                date = currentObject
+                                                    .eXPIRATIONDATE
+                                                    .toString();
+                                                setState(() {
+                                                  flage = 2;
+                                                });
+                                              }
                                             },
                                             child: Text(getLanguage(
                                                 context, 'select'))),
@@ -387,7 +496,7 @@ class _VehicleTabState extends State<VehicleTab> {
                           EdgeInsets.symmetric(horizontal: 30, vertical: 19),
                       child: TextFormField(
                         controller: _controllerName,
-                        focusNode: _focusNodeName,
+                        //        focusNode: _focusNodeName,
                         decoration: InputDecoration(
                           labelText: getLanguage(context, 'Name'),
                           enabledBorder: OutlineInputBorder(
@@ -419,7 +528,7 @@ class _VehicleTabState extends State<VehicleTab> {
                           EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: TextFormField(
                         controller: _controllerPlateNo,
-                        focusNode: _focusNodePlateNo,
+                        //     focusNode: _focusNodePlateNo,
                         decoration: InputDecoration(
                           labelText: getLanguage(context, 'PlateNum'),
                           enabledBorder: OutlineInputBorder(
@@ -440,6 +549,93 @@ class _VehicleTabState extends State<VehicleTab> {
                         },
                         onSaved: (value) {
                           // Add your onSaved logic here
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: getSizePage(context, 1, 60),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      child: TextFormField(
+                        controller: _controllerDrivierLicence,
+                        //            focusNode: _focusNodePlateNo,
+                        decoration: InputDecoration(
+                          labelText: getLanguage(context, 'drivierLicence'),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.green),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          // Add your onChanged logic here
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return getLanguage(context, 'fieldsEmpty');
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          // Add your onSaved logic here
+                        },
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                      visible: flage == 2,
+                      child: Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                                fromDate.toString()),
+                            ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    flage = 3;
+                                  });
+                                },
+                                child: Text(getLanguage(
+                                    context, 'changeExpirationDate')))
+                          ],
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        width: getSizePage(context, 1, 55),
+                      )),
+                  Visibility(
+                    visible: flage == 3,
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      width: getSizePage(context, 1, 55),
+                      child: DateTimeFormField(
+                        style: const TextStyle(
+                          color: Colors.black,
+                          decorationStyle: TextDecorationStyle.solid,
+                        ),
+                        dateFormat: formate,
+                        decoration: InputDecoration(
+                          labelText: getLanguage(context, 'expirationDate'),
+                        ),
+                        firstDate:
+                            DateTime.now().add(const Duration(days: -222222)),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 222222)),
+                        initialPickerDateTime: DateTime.now(),
+                        initialDate: fromDate,
+                        onChanged: (DateTime? value) {
+                          fromDate = value;
+                          //selectedDate = value;
                         },
                       ),
                     ),
@@ -494,6 +690,10 @@ class _VehicleTabState extends State<VehicleTab> {
                           editedvehicle!.vEHICLETYPEID = vehicletype;
                           editedvehicle!.cHANGERID =
                               int.tryParse(widget.user.id!);
+                          editedvehicle!.eXPIRATIONDATE = fromDate.toString();
+                          editedvehicle!.dRIVIERLICENCE =
+                              _controllerDrivierLicence.text;
+
                           await providerVehicle.editVehicle(
                               StaticData.urlVehicleEdit, editedvehicle!);
                           _controllerName.clear();

@@ -144,7 +144,124 @@ class _TransportationFeeState extends State<TransportationFee> {
                         List<Vehicle>? matches = await providerVehicleData
                             .getSearchedVehicleDataAsReturn(StaticData
                                     .urlVehicleSearch +
-                                '?column=${selectedVehicleColumn!.column}&value=${textEditingValue.text}');
+                                '?column=${selectedVehicleColumn!.column}&value=${textEditingValue.text}&type=1');
+
+                        return matches;
+                      } else {
+                        return const Iterable<Vehicle>.empty();
+                      }
+                    },
+                    onSelected: (Vehicle selection) {
+                      selectedVehicle = selection;
+
+                      // Update the text in the TextFormField when a vehicle is selected
+                      _vehicleController.text = selection.nAME ?? '';
+                      print('You just selected ${selectedVehicle.nAME}');
+                      FocusScope.of(context).requestFocus(_providerFieldFocus);
+                    },
+                    fieldViewBuilder: (BuildContext context,
+                        TextEditingController textEditingController,
+                        FocusNode focusNode,
+                        VoidCallback onFieldSubmitted) {
+                      _vehicleController = textEditingController;
+                      _vehicleFieldFocus = focusNode;
+                      //Store the controller
+                      return TextFormField(
+                        controller: textEditingController,
+                        focusNode: focusNode,
+                        onChanged: (String value) {
+                          // Additional actions while the text changes, if needed
+                        },
+                        onFieldSubmitted: (String value) {
+                          // Handle the submitted value, if needed
+                        },
+                        decoration: InputDecoration(
+                          labelText:
+                              getLanguage(context, 'typeToSearchVehicle'),
+                          border: OutlineInputBorder(),
+                        ),
+                      );
+                    },
+                    optionsViewBuilder: (BuildContext context,
+                        AutocompleteOnSelected<Vehicle> onSelected,
+                        Iterable<Vehicle> options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 6.0,
+                          child: Container(
+                            constraints: BoxConstraints(maxHeight: 200.0),
+                            child: SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              child: Container(
+                                width: getSizePage(context, 1, 60),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: options.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final Vehicle option =
+                                        options.elementAt(index);
+                                    return GestureDetector(
+                                      onTap: () {
+                                        onSelected(option);
+                                      },
+                                      child: ListTile(
+                                        title: Text(
+                                            "${getLanguage(context, 'name')}:${option.nAME ?? ''} ${getLanguage(context, 'PlateNum')}: ${option.pLATENO ?? ''} ${getLanguage(context, 'type')}: ${option.vEHICLETYPEID == 1 ? getLanguage(context, 'vehiclee') : getLanguage(context, 'trailer')} "),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: DropdownButton(
+                  hint: Text(getLanguage(context, 'filter')),
+                  dropdownColor: Colors.white,
+                  value: selectedVehicleColumn,
+                  items: vehicleColumnsItems
+                      .map<DropdownMenuItem<VehicleMap>>(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(getLanguage(context, e.nameEnglish!)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (VehicleMap? value) => setState(
+                    () {
+                      if (value != null) selectedVehicleColumn = value;
+                    },
+                  ),
+                ),
+              ),
+              Consumer<ProviderVehicle>(
+                  builder: (context, providerVehicleData, child) {
+                return Container(
+                  width: getSizePage(context, 1, 60),
+                  child: Autocomplete<Vehicle>(
+                    optionsBuilder: (TextEditingValue textEditingValue) async {
+                      if (!textEditingValue.text.isEmpty &&
+                          selectedVehicleColumn != null) {
+                        // Replace 'otherModelList' with your list of OtherModel objects
+                        List<Vehicle>? matches = await providerVehicleData
+                            .getSearchedVehicleDataAsReturn(StaticData
+                                    .urlVehicleSearch +
+                                '?column=${selectedVehicleColumn!.column}&value=${textEditingValue.text}&type=2');
 
                         return matches;
                       } else {

@@ -25,17 +25,17 @@ Map<String, Map<String, String>> languageMap = {
     ////////////////home page //////
     'addDriver': 'إضافة سائق',
     'addvehicle': 'إضافة عربية',
-    'addprovider': 'إضافة موزع',
+    'addprovider': 'إضافة شركة',
     'addTransportationFee': 'إضافة حمولة جديدة ',
     'report': 'شاشة التقرير',
     //////////tansportation fee
     'vehcile': 'السيارة',
     'drvier': 'السائق',
-    'provider': 'الموزع',
-    'providerDetails': 'تفصيل الموزع',
+    'provider': 'الشركة',
+    'providerDetails': 'تفصيل الشركة',
     'typeToSearchVehicle': 'البحث عن السيارة',
-    'typeToSearchProvider': 'البحث عن الموزع',
-    'typeToSearchProviderDerails': 'البحث عن تفصيل الموزع',
+    'typeToSearchProvider': 'البحث عن الشركة',
+    'typeToSearchProviderDerails': 'البحث عن تفصيل الشركة',
     'typeToSearchDriver': 'البحث عن السائق',
     'numberOfTon': 'عدد الأطنان',
     'dateRequest': 'تاريخ الطلب',
@@ -108,7 +108,7 @@ Map<String, Map<String, String>> languageMap = {
     'searchAndEdit': 'بحث و تعديل',
     'messageEditFaildDriver': 'يجب البحث اولا و اختيار السائق ',
     'messageEditFaildvehicle': 'يجب البحث اولا و اختيار السيارة',
-    'messageEditFaildProvider': 'يجب البحث اولا و اختيار الموزع',
+    'messageEditFaildProvider': 'يجب البحث اولا و اختيار الشركة',
     'search': 'بحث',
     'dismissSearch': 'إلغاء البحث',
     'fromTo': 'من و ألي',
@@ -118,7 +118,12 @@ Map<String, Map<String, String>> languageMap = {
     'deleteAlter': 'سيتم حذف الحمولة',
     'messageDelete': 'حذف حمولة رقم',
     'okay': 'نعم',
-    'searchBy': 'بحث بواسطة '
+    'searchBy': 'بحث بواسطة ',
+    'changeExpirationDate': 'تغير تاريخ الانتهاء',
+    'expirationDate': 'تاريخ الانتهاء',
+    'drivierLicence': 'رخصة السيارة',
+    'deleteSuccess': 'تمام الخذف',
+    'deletefail': 'لا يمكن الحذف التسعيرة مستخدمة'
   },
   'en': {
     'changePass': 'Change Password',
@@ -228,7 +233,12 @@ Map<String, Map<String, String>> languageMap = {
     'deleteAlter': 'you will delete ',
     'messageDelete': 'delete number',
     'okay': 'Okay',
-    'searchBy': 'search By'
+    'searchBy': 'search By',
+    'changeExpirationDate': 'Change Expiration Date',
+    'expirationDate': 'Expiration Date',
+    'drivierLicence': 'Drivier Licence',
+    'deleteSuccess': 'Delete Success',
+    'deletefail': 'Delete fail'
   },
 };
 //getLanguage(context,'cancel')

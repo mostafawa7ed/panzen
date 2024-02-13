@@ -6,6 +6,8 @@ class Vehicle {
   int? cHANGERID;
   int? nUMBEROFTRANSACTIONS;
   String? cREATEDAT;
+  String? dRIVIERLICENCE;
+  String? eXPIRATIONDATE;
 
   Vehicle(
       {this.iD,
@@ -14,6 +16,8 @@ class Vehicle {
       this.vEHICLETYPEID,
       this.cHANGERID,
       this.nUMBEROFTRANSACTIONS,
+      this.dRIVIERLICENCE,
+      this.eXPIRATIONDATE,
       this.cREATEDAT});
 
   Vehicle.fromJson(Map<String, dynamic> json) {
@@ -24,6 +28,8 @@ class Vehicle {
     cHANGERID = json['CHANGER_ID'];
     nUMBEROFTRANSACTIONS = json['NUMBER_OF_TRANSACTIONS'];
     cREATEDAT = json['CREATED_AT'];
+    eXPIRATIONDATE = json['EXPIRATION_DATE'];
+    dRIVIERLICENCE = json['DRIVIER_LICENCE'];
   }
 
   Map<String, dynamic> toJson() {
@@ -35,6 +41,8 @@ class Vehicle {
     data['CHANGER_ID'] = this.cHANGERID;
     data['NUMBER_OF_TRANSACTIONS'] = this.nUMBEROFTRANSACTIONS;
     data['CREATED_AT'] = this.cREATEDAT;
+    data['DRIVIER_LICENCE'] = this.dRIVIERLICENCE;
+    data['EXPIRATION_DATE'] = this.eXPIRATIONDATE;
     return data;
   }
 }

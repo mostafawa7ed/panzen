@@ -8,7 +8,6 @@ import 'package:untitled4/model/user_model.dart';
 import 'package:untitled4/page/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled4/page/login.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'controller/provider_provider.dart';
 import 'controller/provider_providerDetails.dart';
 import 'controller/provider_timer.dart';
@@ -89,52 +88,5 @@ class _MyHomePageState extends State<MyHomePage> {
     // return SignUp(
     //   user: user,
     // );
-  }
-}
-
-class VideoPlayerScreen extends StatefulWidget {
-  @override
-  _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
-}
-
-class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late YoutubePlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: 'jDs55BiCSBk',
-      flags: YoutubePlayerFlags(
-        autoPlay: true,
-        mute: false,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return YoutubePlayerBuilder(
-      player: YoutubePlayer(
-        controller: _controller,
-        showVideoProgressIndicator: true,
-      ),
-      builder: (context, player) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // some widgets if needed
-            player,
-            //some widgets if needed
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }

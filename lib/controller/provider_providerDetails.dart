@@ -8,6 +8,7 @@ class ProviderProviderDetails extends ChangeNotifier {
   final Crud _crud = Crud();
   List<ProviderDetails> providerDetailsList = [];
   List<ProviderDetails> searchedList = [];
+  List<ProviderDetails> searchedListRuseltBase = [];
   Text message = Text("");
   double totalvalue = 0.0;
   Future addProviderDetails(String url, ProviderDetails providerDetails) async {
@@ -98,6 +99,8 @@ class ProviderProviderDetails extends ChangeNotifier {
         List<ProviderDetails> searchedListRuselt = providersearchedList
             .map((json) => ProviderDetails.fromJson(json))
             .toList();
+        searchedListRuseltBase = searchedListRuselt;
+        notifyListeners();
         return searchedListRuselt;
 
         //List<dynamic> vehicles = dataResponse['vehicles'];
@@ -112,6 +115,29 @@ class ProviderProviderDetails extends ChangeNotifier {
       print('Error fetching data: $e');
       // Return or handle accordingly
       return [];
+    }
+  }
+
+  Future<String> deleteProviderDetailsDataCustom(String url) async {
+    try {
+      // Make an HTTP GET request to the provided URL
+      Map<String, dynamic> dataResponse = await _crud.deleteRequest(url);
+
+      if (dataResponse['message'] != null) {
+        return dataResponse['message'];
+
+        //List<dynamic> vehicles = dataResponse['vehicles'];
+      } else {
+        // Handle the case where the server returned an error
+        print('Request failed with status: ${dataResponse.toString()}');
+        return dataResponse['error'];
+        // Return or handle accordingly
+      }
+    } catch (e) {
+      // Handle exceptions that might occur during the request
+      print('Error fetching data: $e');
+      // Return or handle accordingly
+      return "catch error";
     }
   }
 

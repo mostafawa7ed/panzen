@@ -58,6 +58,7 @@ class _ProviderTabState extends State<ProviderTab> {
 
   ProviderModel? providerModelEdit;
   int addEdit = 1; //add = 1 edit =2
+  int? currentProvider;
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -362,6 +363,8 @@ class _ProviderTabState extends State<ProviderTab> {
                                       Expanded(
                                         child: ElevatedButton(
                                             onPressed: () async {
+                                              currentProvider =
+                                                  currentObject.iD;
                                               final ProviderProviderDetails
                                                   providerProviderDetails =
                                                   Provider.of<
@@ -630,7 +633,7 @@ class _ProviderTabState extends State<ProviderTab> {
                                                   dateFormat: formate,
                                                   decoration: InputDecoration(
                                                     labelText: getLanguage(
-                                                        context, 'dateFrom'),
+                                                        context, 'dateTo'),
                                                   ),
                                                   firstDate: DateTime.now().add(
                                                       const Duration(
@@ -928,17 +931,21 @@ class _ProviderTabState extends State<ProviderTab> {
                   Consumer<ProviderProviderDetails>(
                       builder: (context, providerProviderDetails, child) {
                     return Visibility(
-                      visible: providerDetailsListForProvider.length > 0,
+                      visible: providerProviderDetails
+                              .searchedListRuseltBase.length >
+                          0,
                       child: Container(
                         padding: const EdgeInsets.only(top: 20),
                         width: getSizePage(context, 1, 60),
                         height: getSizePage(context, 2, 30),
                         child: ListView.builder(
                           //shrinkWrap: true,
-                          itemCount: providerDetailsListForProvider.length,
+                          itemCount: providerProviderDetails
+                              .searchedListRuseltBase.length,
                           itemBuilder: (context, index) {
                             ProviderDetails currentObject =
-                                providerDetailsListForProvider.elementAt(index);
+                                providerProviderDetails.searchedListRuseltBase
+                                    .elementAt(index);
                             return Card(
                               child: Padding(
                                   padding: const EdgeInsets.all(4.0),
@@ -962,6 +969,60 @@ class _ProviderTabState extends State<ProviderTab> {
                                           flex: 2,
                                           child:
                                               Text('${currentObject.tOCITY}')),
+                                      Expanded(
+                                          flex: 2,
+                                          child: ElevatedButton(
+                                            onPressed: () async {
+                                              String messageString =
+                                                  await providerProviderDetails
+                                                      .deleteProviderDetailsDataCustom(
+                                                          StaticData
+                                                                  .urlProviderDetailsDelete +
+                                                              "${currentObject.iD}");
+                                              currentProvider =
+                                                  currentObject.iD;
+                                              await providerProviderDetails
+                                                  .getSearchedProviderDetailsDataCustom(
+                                                      StaticData
+                                                              .urlProviderDetailsSearch +
+                                                          '?column=START_DATE&value= &providerId=${currentProvider}&type=%%');
+                                              final ProviderProvider
+                                                  providerProvider =
+                                                  Provider.of<ProviderProvider>(
+                                                      context,
+                                                      listen: false);
+                                              if (messageString ==
+                                                  "Provider detail deleted successfully") {
+                                                Text message = Text(
+                                                  getLanguage(
+                                                      context, 'deleteSuccess'),
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20,
+                                                      color: Color.fromARGB(
+                                                          255, 31, 124, 19)),
+                                                );
+                                                providerProvider
+                                                    .changeMessage(message);
+                                              } else {
+                                                Text message = Text(
+                                                  getLanguage(
+                                                      context, 'deletefail'),
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20,
+                                                      color: Color.fromARGB(
+                                                          255, 151, 23, 23)),
+                                                );
+                                                providerProvider
+                                                    .changeMessage(message);
+                                              }
+                                            },
+                                            child: Text(
+                                                getLanguage(context, 'delete')),
+                                          )),
                                     ],
                                   ))),
                             );

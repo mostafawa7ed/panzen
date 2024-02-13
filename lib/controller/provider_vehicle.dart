@@ -16,6 +16,8 @@ class ProviderVehicle extends ChangeNotifier {
       "plateNo": vehicle.pLATENO,
       "vehicleTypeId": vehicle.vEHICLETYPEID,
       "changerId": vehicle.cHANGERID,
+      "drivierLicence": vehicle.dRIVIERLICENCE,
+      "expirationDate": vehicle.eXPIRATIONDATE,
     };
     try {
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, mymap);
@@ -120,6 +122,8 @@ class ProviderVehicle extends ChangeNotifier {
       "plateNo": vehicle.pLATENO,
       "vehicleTypeId": vehicle.vEHICLETYPEID,
       "changerId": vehicle.cHANGERID,
+      "drivierLicence": vehicle.dRIVIERLICENCE,
+      "expirationDate": vehicle.eXPIRATIONDATE,
     };
 
     try {
