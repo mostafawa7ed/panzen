@@ -24,9 +24,11 @@ class ProviderTransportationFee extends ChangeNotifier {
           int.tryParse(transportationFee.providersDetailsId!) ?? 1,
       "driversId": int.tryParse(transportationFee.driversId!) ?? 1,
       "carsId": int.tryParse(transportationFee.carsId!) ?? 1,
+      "trailerId": int.tryParse(transportationFee.trailerId!) ?? 1,
       "totalValue": double.tryParse(transportationFee.totalValue!) ?? 1,
       "numberOfTon": double.tryParse(transportationFee.numberOfTon!) ?? 1,
       "requestDate": requestDate.toString(),
+      "endDate": transportationFee.endDate,
       "changerId": int.tryParse(transportationFee.changerId!) ?? 1,
       "providersReciverId": int.tryParse(transportationFee.providersReciverId!),
       "type": transportationFee.type

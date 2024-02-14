@@ -24,7 +24,7 @@ Map<String, Map<String, String>> languageMap = {
     'messageFaildsEmpty': 'احد الحقول فارغة من فضلك ادخل جميع الحقول',
     ////////////////home page //////
     'addDriver': 'إضافة سائق',
-    'addvehicle': 'إضافة عربية',
+    'addvehicle': 'إضافة سيارة',
     'addprovider': 'إضافة شركة',
     'addTransportationFee': 'إضافة حمولة جديدة ',
     'report': 'شاشة التقرير',
@@ -34,6 +34,7 @@ Map<String, Map<String, String>> languageMap = {
     'provider': 'الشركة',
     'providerDetails': 'تفصيل الشركة',
     'typeToSearchVehicle': 'البحث عن السيارة',
+    'typeToSearchTrailer': 'البحث عن مقطورة',
     'typeToSearchProvider': 'البحث عن الشركة',
     'typeToSearchProviderDerails': 'البحث عن تفصيل الشركة',
     'typeToSearchDriver': 'البحث عن السائق',
@@ -43,7 +44,7 @@ Map<String, Map<String, String>> languageMap = {
     'messageSuccess': 'تمت الإضافة بنجاح',
     'messageFaild': 'فشل في الإضافة',
     'tablTransportation': 'إضافة حمولة',
-    'vehicle': 'عربية نقل',
+    'vehicle': 'سيارة نقل',
     'driver': 'السائق',
     'requestDate': 'تاريخ الطلب',
     'addTransportation': 'إضافة حمولة جديدة',
@@ -92,8 +93,8 @@ Map<String, Map<String, String>> languageMap = {
     'companyNokeName': 'للمقاولات العمومية و الخدمات البترولية و توريد العمالة',
     'total': 'الإجمالي',
     'type': 'النوع',
-    'fromCity': 'من مدينة',
-    'toCity': 'الي مدينة',
+    'fromCity': 'من جهة',
+    'toCity': 'الي جهة',
     'searchByProvider': 'بحث بالمورد',
     'license': 'رخصة سيارة',
     'Diesel': 'مازوت',
@@ -123,7 +124,10 @@ Map<String, Map<String, String>> languageMap = {
     'expirationDate': 'تاريخ الانتهاء',
     'drivierLicence': 'رخصة السيارة',
     'deleteSuccess': 'تمام الخذف',
-    'deletefail': 'لا يمكن الحذف التسعيرة مستخدمة'
+    'deletefail': 'لا يمكن الحذف التسعيرة مستخدمة',
+    'DrivierLicence': 'رخصة السيارة',
+    'displayReport': 'عرض التقرير',
+    'fromToDestination': 'من و الي جهة',
   },
   'en': {
     'changePass': 'Change Password',
@@ -238,10 +242,14 @@ Map<String, Map<String, String>> languageMap = {
     'expirationDate': 'Expiration Date',
     'drivierLicence': 'Drivier Licence',
     'deleteSuccess': 'Delete Success',
-    'deletefail': 'Delete fail'
+    'deletefail': 'Delete fail',
+    'typeToSearchTrailer': 'search By Trailer',
+    'DrivierLicence': 'Drivier Licence',
+    'displayReport': 'Display Report',
+    'fromToDestination': 'Destination',
   },
 };
-//getLanguage(context,'cancel')
+//getLanguage(context,'displayReport')
 String getLanguage(BuildContext context, String key) {
   Locale currentLocal = Localizations.localeOf(context);
   //get current Local

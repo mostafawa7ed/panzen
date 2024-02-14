@@ -14,11 +14,15 @@ class ProviderReportData extends ChangeNotifier {
   final Crud _crud = Crud();
 
   Future<void> transportaionfeeReportPrepareList(
-      String url, DateTime fromDate, DateTime toDate) async {
+      String url, DateTime fromDate, DateTime toDate, int? providerId) async {
     try {
       String fromDate1 = DateFormat('yyyy-MM-dd').format(fromDate);
       String todate1 = DateFormat('yyyy-MM-dd').format(toDate);
-      Map<String, dynamic> mymap = {"from": fromDate1, "to": todate1};
+      Map<String, dynamic> mymap = {
+        "from": fromDate1,
+        "to": todate1,
+        "providerId": providerId
+      };
       // Make an HTTP GET request to the provided URL
       Map<String, dynamic> dataResponse = await _crud.postRequest(url, mymap);
 

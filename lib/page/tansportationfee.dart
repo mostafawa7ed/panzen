@@ -36,18 +36,21 @@ class _TransportationFeeState extends State<TransportationFee> {
   TextEditingController numberOfTon = TextEditingController();
   TextEditingController totalValue = TextEditingController();
   TextEditingController _vehicleController = TextEditingController();
+  TextEditingController _trailerController = TextEditingController();
   TextEditingController _providerController = TextEditingController();
   TextEditingController _providerReciverController = TextEditingController();
   TextEditingController _providerDetailsController = TextEditingController();
   TextEditingController _driverController = TextEditingController();
 
   Vehicle selectedVehicle = Vehicle();
+  Vehicle selectedTrailer = Vehicle();
   ProviderModel selectedProviderMOdel = ProviderModel();
   ProviderModel selectedProviderReciverMOdel = ProviderModel();
   ProviderDetails selectedProviderDetails = ProviderDetails();
   DriverModel selectedDriver = DriverModel();
 
   FocusNode _vehicleFieldFocus = FocusNode();
+  FocusNode _trailerFieldFocus = FocusNode();
   FocusNode _providerFieldFocus = FocusNode();
   FocusNode _providerDetailsFieldFocus = FocusNode();
   FocusNode _providerDetailsReciverFieldFocus = FocusNode();
@@ -55,10 +58,13 @@ class _TransportationFeeState extends State<TransportationFee> {
   FocusNode _numberTonFieldFocus = FocusNode();
 
   DateTime? requestDate;
+  DateTime? endDate;
   VehicleMap? selectedVehicleColumn; //= VehicleMap("Name", "الأسم", "NAME");
+  VehicleMap? selectedTrailerColumn;
   List<VehicleMap> vehicleColumnsItems = [
     VehicleMap("Name", "NAME"),
     VehicleMap("PlateNum", "PLATE_NO"),
+    VehicleMap("DrivierLicence", "DRIVIER_LICENCE"),
   ];
   ProviderMap? selectedProviderMapColumn;
   List<ProviderMap> providerColumnsItems = [
@@ -157,124 +163,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                       // Update the text in the TextFormField when a vehicle is selected
                       _vehicleController.text = selection.nAME ?? '';
                       print('You just selected ${selectedVehicle.nAME}');
-                      FocusScope.of(context).requestFocus(_providerFieldFocus);
-                    },
-                    fieldViewBuilder: (BuildContext context,
-                        TextEditingController textEditingController,
-                        FocusNode focusNode,
-                        VoidCallback onFieldSubmitted) {
-                      _vehicleController = textEditingController;
-                      _vehicleFieldFocus = focusNode;
-                      //Store the controller
-                      return TextFormField(
-                        controller: textEditingController,
-                        focusNode: focusNode,
-                        onChanged: (String value) {
-                          // Additional actions while the text changes, if needed
-                        },
-                        onFieldSubmitted: (String value) {
-                          // Handle the submitted value, if needed
-                        },
-                        decoration: InputDecoration(
-                          labelText:
-                              getLanguage(context, 'typeToSearchVehicle'),
-                          border: OutlineInputBorder(),
-                        ),
-                      );
-                    },
-                    optionsViewBuilder: (BuildContext context,
-                        AutocompleteOnSelected<Vehicle> onSelected,
-                        Iterable<Vehicle> options) {
-                      return Align(
-                        alignment: Alignment.topLeft,
-                        child: Material(
-                          elevation: 6.0,
-                          child: Container(
-                            constraints: BoxConstraints(maxHeight: 200.0),
-                            child: SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              child: Container(
-                                width: getSizePage(context, 1, 60),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: options.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final Vehicle option =
-                                        options.elementAt(index);
-                                    return GestureDetector(
-                                      onTap: () {
-                                        onSelected(option);
-                                      },
-                                      child: ListTile(
-                                        title: Text(
-                                            "${getLanguage(context, 'name')}:${option.nAME ?? ''} ${getLanguage(context, 'PlateNum')}: ${option.pLATENO ?? ''} ${getLanguage(context, 'type')}: ${option.vEHICLETYPEID == 1 ? getLanguage(context, 'vehiclee') : getLanguage(context, 'trailer')} "),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: DropdownButton(
-                  hint: Text(getLanguage(context, 'filter')),
-                  dropdownColor: Colors.white,
-                  value: selectedVehicleColumn,
-                  items: vehicleColumnsItems
-                      .map<DropdownMenuItem<VehicleMap>>(
-                        (e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(getLanguage(context, e.nameEnglish!)),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (VehicleMap? value) => setState(
-                    () {
-                      if (value != null) selectedVehicleColumn = value;
-                    },
-                  ),
-                ),
-              ),
-              Consumer<ProviderVehicle>(
-                  builder: (context, providerVehicleData, child) {
-                return Container(
-                  width: getSizePage(context, 1, 60),
-                  child: Autocomplete<Vehicle>(
-                    optionsBuilder: (TextEditingValue textEditingValue) async {
-                      if (!textEditingValue.text.isEmpty &&
-                          selectedVehicleColumn != null) {
-                        // Replace 'otherModelList' with your list of OtherModel objects
-                        List<Vehicle>? matches = await providerVehicleData
-                            .getSearchedVehicleDataAsReturn(StaticData
-                                    .urlVehicleSearch +
-                                '?column=${selectedVehicleColumn!.column}&value=${textEditingValue.text}&type=2');
-
-                        return matches;
-                      } else {
-                        return const Iterable<Vehicle>.empty();
-                      }
-                    },
-                    onSelected: (Vehicle selection) {
-                      selectedVehicle = selection;
-
-                      // Update the text in the TextFormField when a vehicle is selected
-                      _vehicleController.text = selection.nAME ?? '';
-                      print('You just selected ${selectedVehicle.nAME}');
-                      FocusScope.of(context).requestFocus(_providerFieldFocus);
+                      FocusScope.of(context).requestFocus(_trailerFieldFocus);
                     },
                     fieldViewBuilder: (BuildContext context,
                         TextEditingController textEditingController,
@@ -349,6 +238,124 @@ class _TransportationFeeState extends State<TransportationFee> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: DropdownButton(
+                  hint: Text(getLanguage(context, 'filter')),
+                  dropdownColor: Colors.white,
+                  value: selectedTrailerColumn,
+                  items: vehicleColumnsItems
+                      .map<DropdownMenuItem<VehicleMap>>(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(getLanguage(context, e.nameEnglish!)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (VehicleMap? value) => setState(
+                    () {
+                      if (value != null) selectedTrailerColumn = value;
+                    },
+                  ),
+                ),
+              ),
+              Consumer<ProviderVehicle>(
+                  builder: (context, providerVehicleData, child) {
+                return Container(
+                  width: getSizePage(context, 1, 60),
+                  child: Autocomplete<Vehicle>(
+                    optionsBuilder: (TextEditingValue textEditingValue) async {
+                      if (!textEditingValue.text.isEmpty &&
+                          selectedTrailerColumn != null) {
+                        // Replace 'otherModelList' with your list of OtherModel objects
+                        List<Vehicle>? matches = await providerVehicleData
+                            .getSearchedVehicleDataAsReturn(StaticData
+                                    .urlVehicleSearch +
+                                '?column=${selectedTrailerColumn!.column}&value=${textEditingValue.text}&type=2');
+
+                        return matches;
+                      } else {
+                        return const Iterable<Vehicle>.empty();
+                      }
+                    },
+                    onSelected: (Vehicle selection) {
+                      selectedTrailer = selection;
+
+                      // Update the text in the TextFormField when a vehicle is selected
+                      _trailerController.text = selection.nAME ?? '';
+                      print('You just selected ${selectedTrailer.nAME}');
+                      FocusScope.of(context).requestFocus(_providerFieldFocus);
+                    },
+                    fieldViewBuilder: (BuildContext context,
+                        TextEditingController textEditingController,
+                        FocusNode focusNode,
+                        VoidCallback onFieldSubmitted) {
+                      _trailerController = textEditingController;
+                      _trailerFieldFocus = focusNode;
+                      //Store the controller
+                      return TextFormField(
+                        controller: textEditingController,
+                        focusNode: focusNode,
+                        onChanged: (String value) {
+                          // Additional actions while the text changes, if needed
+                        },
+                        onFieldSubmitted: (String value) {
+                          // Handle the submitted value, if needed
+                        },
+                        decoration: InputDecoration(
+                          labelText:
+                              getLanguage(context, 'typeToSearchTrailer'),
+                          border: OutlineInputBorder(),
+                        ),
+                      );
+                    },
+                    optionsViewBuilder: (BuildContext context,
+                        AutocompleteOnSelected<Vehicle> onSelected,
+                        Iterable<Vehicle> options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 6.0,
+                          child: Container(
+                            constraints: BoxConstraints(maxHeight: 200.0),
+                            child: SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              child: Container(
+                                width: getSizePage(context, 1, 60),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: options.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final Vehicle option =
+                                        options.elementAt(index);
+                                    return GestureDetector(
+                                      onTap: () {
+                                        onSelected(option);
+                                      },
+                                      child: ListTile(
+                                        title: Text(
+                                            "${getLanguage(context, 'name')}:${option.nAME ?? ''} ${getLanguage(context, 'PlateNum')}: ${option.pLATENO ?? ''} ${getLanguage(context, 'type')}: ${option.vEHICLETYPEID == 1 ? getLanguage(context, 'vehiclee') : getLanguage(context, 'trailer')} "),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
+            ],
+          ),
+          Padding(padding: EdgeInsets.only(top: 20)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: DropdownButton(
                   dropdownColor: Colors.white,
                   hint: Text(getLanguage(context, 'filter')),
                   value: selectedProviderMapColumn,
@@ -367,6 +374,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                   ),
                 ),
               ),
+              Padding(padding: EdgeInsets.only(right: 27)),
               Consumer<ProviderProvider>(
                   builder: (context, providerProvider, child) {
                 return Container(
@@ -520,6 +528,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                   ),
                 ),
               ),
+              Padding(padding: EdgeInsets.only(right: 15)),
               Consumer<ProviderProviderDetails>(
                   builder: (context, providerProviderDetails, child) {
                 return Container(
@@ -604,7 +613,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                                       },
                                       child: ListTile(
                                         title: Text(
-                                            "${getLanguage(context, 'type')}: ${option.tYPE ?? ''} ${getLanguage(context, 'costPerTon')}:  ${option.aMMOUNTPERTON ?? ''} ${getLanguage(context, 'date')}:  ${option.sTARTDATE ?? ''} "),
+                                            "${getLanguage(context, 'type')}: ${option.tYPE ?? ''} ${getLanguage(context, 'costPerTon')}:  ${option.aMMOUNTPERTON ?? ''} ${getLanguage(context, 'fromToDestination')}: ${option.fROMCITY ?? ''} / ${option.tOCITY ?? ''}  ${getLanguage(context, 'date')}:  ${option.sTARTDATE ?? ''} "),
                                       ),
                                     );
                                   },
@@ -646,6 +655,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                   ),
                 ),
               ),
+              Padding(padding: EdgeInsets.only(right: 26)),
               Consumer<ProviderProvider>(
                   builder: (context, providerProvider, child) {
                 return Container(
@@ -745,7 +755,7 @@ class _TransportationFeeState extends State<TransportationFee> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 15),
                 child: DropdownButton(
                   dropdownColor: Colors.white,
                   hint: Text(getLanguage(context, 'filter')),
@@ -889,13 +899,33 @@ class _TransportationFeeState extends State<TransportationFee> {
                 decorationStyle: TextDecorationStyle.solid,
               ),
               decoration: InputDecoration(
-                labelText: getLanguage(context, 'dateTo'),
+                labelText: getLanguage(context, 'dateFrom'),
               ),
               firstDate: DateTime.now().add(const Duration(days: -222222)),
               lastDate: DateTime.now().add(const Duration(days: 222222)),
               initialPickerDateTime: DateTime.now(),
               onChanged: (DateTime? value) {
                 requestDate = value;
+                //selectedDate = value;
+              },
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(top: 15)),
+          Container(
+            width: getSizePage(context, 1, 63),
+            child: DateTimeFormField(
+              style: const TextStyle(
+                color: Colors.black,
+                decorationStyle: TextDecorationStyle.solid,
+              ),
+              decoration: InputDecoration(
+                labelText: getLanguage(context, 'dateTo'),
+              ),
+              firstDate: DateTime.now().add(const Duration(days: -222222)),
+              lastDate: DateTime.now().add(const Duration(days: 222222)),
+              initialPickerDateTime: DateTime.now(),
+              onChanged: (DateTime? value) {
+                endDate = value;
                 //selectedDate = value;
               },
             ),
@@ -914,9 +944,11 @@ class _TransportationFeeState extends State<TransportationFee> {
                         listen: false);
                 type = selectedProviderDetails.tYPE!;
                 if (selectedVehicle.iD == null &&
+                    selectedTrailer.iD == null &&
                     numberOfTon.text == "" &&
                     selectedProviderDetails.iD == null &&
                     requestDate == null &&
+                    endDate == null &&
                     totalValue.text == "" &&
                     selectedDriver.iDD == null &&
                     selectedProviderReciverMOdel.iD == null &&
@@ -932,6 +964,8 @@ class _TransportationFeeState extends State<TransportationFee> {
                   TransportationFeeModel transportationFeeModel =
                       TransportationFeeModel();
                   transportationFeeModel.carsId = selectedVehicle.iD.toString();
+                  transportationFeeModel.trailerId =
+                      selectedTrailer.iD.toString();
                   transportationFeeModel.changerId =
                       widget.user.id.toString(); //widget.user.id
                   transportationFeeModel.numberOfTon =
@@ -939,6 +973,7 @@ class _TransportationFeeState extends State<TransportationFee> {
                   transportationFeeModel.providersDetailsId =
                       selectedProviderDetails.iD.toString();
                   transportationFeeModel.requestDate = requestDate.toString();
+                  transportationFeeModel.endDate = endDate.toString();
                   transportationFeeModel.totalValue =
                       totalValue.text.toString();
                   transportationFeeModel.driversId =
@@ -961,11 +996,13 @@ class _TransportationFeeState extends State<TransportationFee> {
                   numberOfTon.clear();
                   totalValue.clear();
                   _vehicleController.clear();
+                  _trailerController.clear();
                   _providerController.clear();
                   _providerDetailsController.clear();
                   _driverController.clear();
                   _providerReciverController.clear();
                   selectedVehicle = Vehicle();
+                  selectedTrailer = Vehicle();
                   selectedProviderReciverMOdel = ProviderModel();
                   selectedProviderMOdel = ProviderModel();
                   selectedProviderDetails = ProviderDetails();

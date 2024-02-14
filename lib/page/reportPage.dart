@@ -12,7 +12,11 @@ import 'package:untitled4/controller/provider_report.dart';
 import 'package:untitled4/data/staticdata.dart';
 import 'package:untitled4/model/transportationfeeReportMode.dart';
 
+import '../controller/provider_provider.dart';
 import '../data/langaue.dart';
+import '../functions/mediaquery.dart';
+import '../model/provider_model.dart';
+import '../model/vehicle_model.dart';
 
 class ReportTap extends StatefulWidget {
   const ReportTap({super.key});
@@ -24,6 +28,14 @@ class ReportTap extends StatefulWidget {
 class _ReportTapState extends State<ReportTap> {
   DateTime? fromDate;
   DateTime? toDate;
+  ProviderMap? selectedProviderMapColumn;
+  List<ProviderMap> providerColumnsItems = [
+    ProviderMap("Name", "NAME"),
+    ProviderMap("Address", "ADDRESS"),
+  ];
+  ProviderModel selectedProviderMOdel = ProviderModel();
+  Vehicle selectedVehicle = Vehicle();
+  TextEditingController _providerController = TextEditingController();
   final formate = DateFormat('yyyy-MM-dd-HH-mm');
   @override
   Widget build(BuildContext context) {
@@ -34,6 +46,125 @@ class _ReportTapState extends State<ReportTap> {
             getLanguage(context, 'reportTransportationFee')),
         Row(
           children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: DropdownButton(
+                    dropdownColor: Colors.white,
+                    hint: Text(getLanguage(context, 'filter')),
+                    value: selectedProviderMapColumn,
+                    items: providerColumnsItems
+                        .map<DropdownMenuItem<ProviderMap>>(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(getLanguage(context, e.nameEnglish!)),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (ProviderMap? value) => setState(
+                      () {
+                        if (value != null) selectedProviderMapColumn = value;
+                      },
+                    ),
+                  ),
+                ),
+                Padding(padding: EdgeInsets.only(right: 27)),
+                Consumer<ProviderProvider>(
+                    builder: (context, providerProvider, child) {
+                  return Container(
+                    width: getSizePage(context, 1, 60),
+                    child: Autocomplete<ProviderModel>(
+                      optionsBuilder:
+                          (TextEditingValue textEditingValue) async {
+                        if (textEditingValue.text.isEmpty ||
+                            selectedProviderMapColumn == null) {
+                          return const Iterable<ProviderModel>.empty();
+                        } else {
+                          // Replace 'otherModelList' with your list of OtherModel objects
+                          List<ProviderModel> matches = await providerProvider
+                              .getSearchedProviderDataCustom(StaticData
+                                      .urlProviderSearch +
+                                  '?column=${selectedProviderMapColumn!.column}&value=${textEditingValue.text}');
+
+                          return matches;
+                        }
+                      },
+                      onSelected: (ProviderModel selection) async {
+                        selectedProviderMOdel = selection;
+
+                        // Update the text in the TextFormField when a vehicle is selected
+                        _providerController.text = selection.nAME ?? '';
+                        //   print('You just selected ${selectedVehicle.nAME}');
+                      },
+                      fieldViewBuilder: (BuildContext context,
+                          TextEditingController textEditingController,
+                          FocusNode focusNode,
+                          VoidCallback onFieldSubmitted) {
+                        _providerController = textEditingController;
+                        //_providerFieldFocus = focusNode; // Store the controller
+                        return TextFormField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          onChanged: (String value) {
+                            // Additional actions while the text changes, if needed
+                          },
+                          onFieldSubmitted: (String value) {
+                            // Handle the submitted value, if needed
+                          },
+                          decoration: InputDecoration(
+                            labelText:
+                                getLanguage(context, 'typeToSearchProvider'),
+                            border: OutlineInputBorder(),
+                          ),
+                        );
+                      },
+                      optionsViewBuilder: (BuildContext context,
+                          AutocompleteOnSelected<ProviderModel> onSelected,
+                          Iterable<ProviderModel> options) {
+                        return Align(
+                          alignment: Alignment.topLeft,
+                          child: Material(
+                            elevation: 6.0,
+                            child: Container(
+                              constraints: BoxConstraints(maxHeight: 200.0),
+                              child: SingleChildScrollView(
+                                physics: AlwaysScrollableScrollPhysics(),
+                                child: Container(
+                                  width: getSizePage(context, 1, 60),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: options.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final ProviderModel option =
+                                          options.elementAt(index);
+                                      return GestureDetector(
+                                        onTap: () {
+                                          onSelected(option);
+                                        },
+                                        child: ListTile(
+                                          title: Text(getLanguage(
+                                                  context, 'provider') +
+                                              ": " +
+                                              "${option.nAME ?? ''}${getLanguage(context, 'address')}: ${option.aDDRESS ?? ''} ${getLanguage(context, 'taxNumber')}: ${option.tAXNUMBER ?? ''} "),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }),
+              ],
+            ),
             Expanded(
               flex: 1,
               child: Column(
@@ -60,28 +191,28 @@ class _ReportTapState extends State<ReportTap> {
                       },
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DateTimeFormField(
-                      style: const TextStyle(
-                        color: Colors.black,
-                        decorationStyle: TextDecorationStyle.solid,
-                      ),
-                      dateFormat: formate,
-                      decoration: InputDecoration(
-                        labelText: getLanguage(context, 'dateTo'),
-                      ),
-                      firstDate:
-                          DateTime.now().add(const Duration(days: -222222)),
-                      lastDate:
-                          DateTime.now().add(const Duration(days: 222222)),
-                      initialPickerDateTime: DateTime.now(),
-                      onChanged: (DateTime? value) {
-                        toDate = value;
-                        //selectedDate = value;
-                      },
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: DateTimeFormField(
+                  //     style: const TextStyle(
+                  //       color: Colors.black,
+                  //       decorationStyle: TextDecorationStyle.solid,
+                  //     ),
+                  //     dateFormat: formate,
+                  //     decoration: InputDecoration(
+                  //       labelText: getLanguage(context, 'dateTo'),
+                  //     ),
+                  //     firstDate:
+                  //         DateTime.now().add(const Duration(days: -222222)),
+                  //     lastDate:
+                  //         DateTime.now().add(const Duration(days: 222222)),
+                  //     initialPickerDateTime: DateTime.now(),
+                  //     onChanged: (DateTime? value) {
+                  //       toDate = value;
+                  //       //selectedDate = value;
+                  //     },
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -99,7 +230,8 @@ class _ReportTapState extends State<ReportTap> {
                             .transportaionfeeReportPrepareList(
                                 StaticData.urlGetTransportationFeeReport,
                                 fromDate!,
-                                toDate!);
+                                toDate!,
+                                selectedProviderMOdel.iD!);
                         File pdfFile = await generatePDF(
                             providerReportData.transportaionfeeReportList,
                             fromDate!,
@@ -109,7 +241,7 @@ class _ReportTapState extends State<ReportTap> {
                         print("enter date");
                       }
                     },
-                    child: const Text("displayReport")))
+                    child: Text(getLanguage(context, 'displayReport'))))
           ],
         ),
       ],
@@ -276,6 +408,11 @@ Future<File> generatePDF(List<TransportaionfeeReport> data, DateTime fromDate,
   return file;
 }
 
+class ProviderMap {
+  String? nameEnglish;
+  String? column;
 
+  ProviderMap(this.nameEnglish, this.column);
+}
 // File pdfFile =
 //                     await generatePDF(providerTransportationFee.vehicleList);

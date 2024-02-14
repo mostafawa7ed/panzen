@@ -27,6 +27,7 @@ class _VehicleTabState extends State<VehicleTab> {
   List<VehicleMap> vehicleColumnsItems = [
     VehicleMap("Name", "NAME"),
     VehicleMap("PlateNum", "PLATE_NO"),
+    VehicleMap("DrivierLicence", "DRIVIER_LICENCE"),
   ];
   @override
   void initState() {
@@ -201,31 +202,6 @@ class _VehicleTabState extends State<VehicleTab> {
                       },
                     ),
                   ),
-                  // Container(
-                  //   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  //   width: getSizePage(context, 1, 55),
-                  //   child: DateTimeFormField(
-                  //     style: const TextStyle(
-                  //       color: Colors.black,
-                  //       decorationStyle: TextDecorationStyle.solid,
-                  //     ),
-                  //     dateFormat: formate,
-                  //     decoration: InputDecoration(
-                  //       labelText: getLanguage(context, 'dateFrom'),
-                  //     ),
-                  //     firstDate:
-                  //         DateTime.now().add(const Duration(days: -222222)),
-                  //     lastDate:
-                  //         DateTime.now().add(const Duration(days: 222222)),
-                  //     initialPickerDateTime:
-                  //         fromDate != null ? fromDate! : DateTime.now(),
-                  //     initialDate: fromDate ?? DateTime.now(),
-                  //     onChanged: (DateTime? value) {
-                  //       fromDate = value;
-                  //       //selectedDate = value;
-                  //     },
-                  //   ),
-                  // ),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     width: getSizePage(context, 1, 55),
@@ -347,18 +323,16 @@ class _VehicleTabState extends State<VehicleTab> {
                                   ),
                                 )
                                 .toList(),
-                            onChanged: (VehicleMap? value) => setState(
-                              () async {
-                                if (value != null) selectedColumn = value;
-                                String url = StaticData.urlVehicleSearch +
-                                    '?column=NAME&value= ';
-                                final ProviderVehicle providerVehicle =
-                                    Provider.of<ProviderVehicle>(context,
-                                        listen: false);
-                                await providerVehicle
-                                    .getSearchedVehicleData(url);
-                              },
-                            ),
+                            onChanged: (VehicleMap? value) async {
+                              if (value != null) selectedColumn = value;
+                              String url = StaticData.urlVehicleSearch +
+                                  '?column=NAME&value= ';
+                              final ProviderVehicle providerVehicle =
+                                  Provider.of<ProviderVehicle>(context,
+                                      listen: false);
+                              await providerVehicle.getSearchedVehicleData(url);
+                              setState(() {});
+                            },
                           ),
                         ),
                         Expanded(flex: 2, child: SizedBox()),
@@ -384,6 +358,7 @@ class _VehicleTabState extends State<VehicleTab> {
                                           listen: false);
                                   await providerVehicle
                                       .getSearchedVehicleData(url);
+                                  setState(() {});
                                 }
                               },
                             ),
@@ -397,6 +372,7 @@ class _VehicleTabState extends State<VehicleTab> {
                                   Provider.of<ProviderVehicle>(context,
                                       listen: false);
                               await providerVehicle.getSearchedVehicleData(url);
+                              setState(() {});
                             },
                             child: Text(getLanguage(context, 'search'))),
                         ElevatedButton(
@@ -406,6 +382,7 @@ class _VehicleTabState extends State<VehicleTab> {
                                       listen: false);
                               await providerVehicle
                                   .getSearchedVehicleMakeEmpty();
+                              setState(() {});
                             },
                             child: Text(getLanguage(context, 'dismissSearch'))),
                         Expanded(child: SizedBox()),
@@ -415,8 +392,8 @@ class _VehicleTabState extends State<VehicleTab> {
                   Consumer<ProviderVehicle>(
                       builder: (context, providerVehicle, child) {
                     return Visibility(
-                      visible: providerVehicle.searchedList.length > 0 &&
-                          _controllerSearched != '',
+                      visible: providerVehicle.searchedList.length > 0,
+                      //visible: true,
                       child: Container(
                         padding: EdgeInsets.only(top: 20),
                         width: getSizePage(context, 1, 60),
